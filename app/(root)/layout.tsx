@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "../globals.css";
 import Topbar from "../components/shared/Topbar";
 import { ClerkProvider } from "@clerk/nextjs";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "../components/shared/Sidebar";
 
 
 export const metadata: Metadata = {
@@ -15,15 +17,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`antialiased`}
-        >
-          <Topbar/>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+        <html lang="en">
+          <ClerkProvider>
+              <body
+                className={`antialiased`}
+              >
+              <SidebarProvider>
+                <AppSidebar/>
+                {/* <Topbar/> */}
+                <SidebarTrigger/>
+                {children}
+             </SidebarProvider>
+              </body>
+            </ClerkProvider>
+        </html>
   );
 }
