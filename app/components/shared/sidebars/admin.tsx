@@ -5,12 +5,12 @@ const Staff = "assets/staff.svg"
 export const items = [
     {
       title: "DashBoard",
-      url: "#",
+      url: "/",
       icon: dashboard,
     },
     {
       title: "Calendar",
-      url: "#",
+      url: "/calendar",
       icon: Calendar,
     },
     {

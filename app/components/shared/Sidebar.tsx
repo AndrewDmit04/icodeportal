@@ -44,9 +44,9 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-            <div className="flex gap-2 ml-10">
+            <div className="flex gap-2 w-10 items-center">
                 <UserButton></UserButton>
-                <p>Account</p>
+                <p className="text-3xl">Account</p>
             </div>
             
         </SidebarFooter>

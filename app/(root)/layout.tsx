@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import Topbar from "../components/shared/Topbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "../components/shared/Sidebar";
@@ -18,6 +17,9 @@ export default function RootLayout({
 }>) {
   return (
         <html lang="en">
+          <head>
+            <title>Portal</title>
+          </head>
           <ClerkProvider>
               <body
                 className={`antialiased`}
