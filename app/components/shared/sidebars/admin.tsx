@@ -2,7 +2,7 @@ const dashboard = "assets/dashboard.svg"
 const Calendar = "assets/calendar.svg"
 const TimerIcon = "assets/timerIcon.svg"
 const Staff = "assets/staff.svg"
-export const items = [
+export const adminContents = [
     {
       title: "DashBoard",
       url: "/",

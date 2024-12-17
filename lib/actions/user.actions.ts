@@ -35,7 +35,38 @@ interface Params1{
 }
 
 export async function getUser({id} : Params1) : Promise<typeof User>{
-  connectToDB();
-  const user = await User.findOne({"id" : id});
-  return user; 
+  try{
+    connectToDB();
+    const user = await User.findOne({"id" : id});
+    return user;
+  }
+  catch (error) {
+    console.error('Error in createOrFindUser:', error);
+    throw error;
+  }
+}
+
+export async function isVerrified({id} : Params1) : Promise<boolean>{
+  try{
+    connectToDB();
+    const user = await User.findOne({"id" : id});
+    return user.verified;
+  }
+  catch (error) {
+    console.error('Error in createOrFindUser:', error);
+    throw error;
+  }
+}
+
+export async function getRole({id} : Params1) : Promise<String>{
+  try{
+    connectToDB();
+    const user = await User.findOne({"id" : id});
+    return user.role;
+  }
+  catch (error) {
+    console.error('Error in createOrFindUser:', error);
+    throw error;
+  }
+  
 }

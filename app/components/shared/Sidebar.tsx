@@ -1,5 +1,6 @@
 // import { Calendar, Search, Settings, LayoutDashboardIcon, TimerIcon} from "lucide-react"
-import { items } from "./sidebars/admin"
+import { adminContents } from "./sidebars/admin"
+import {userContents} from "./sidebars/user"
 import Link from "next/link"
 
 import {
@@ -15,9 +16,15 @@ import {
 } from "@/components/ui/sidebar"
 import { UserButton } from "@clerk/nextjs"
 import Image from "next/image"
+import { getRole } from "@/lib/actions/user.actions"
+import { currentUser } from "@clerk/nextjs/server"
 
-export function AppSidebar() {
-    return (
+export async function AppSidebar() {
+  const user = await currentUser();
+  if(!user){return}
+  const role = await getRole({id : user.id});
+  const items = role === "Director" ? adminContents : userContents;
+  return (
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
