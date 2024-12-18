@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   role: { type: String, required: true, default: "Instuctor" },
   onboarded: { type: Boolean, default: false },
   verified: { type: Boolean, default: false }, // New boolean flag
-},{collection : 'portal'});
+},{collection : 'users'});
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 

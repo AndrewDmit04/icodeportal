@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import "../globals.css";
 import { ClerkProvider, UserButton } from "@clerk/nextjs";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "../components/shared/Sidebar";
+import { AppSidebar } from "../components/shared/sidebar/Sidebar";
 import { getUser, isVerrified } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Verification from "../components/shared/Verification";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -28,7 +29,9 @@ export default async function RootLayout({
       redirect('/onboarding')
       return null
     }
-    const verrified = await isVerrified({id : user.id});
+    
+    const verrified = monUser.verified;
+
     return (
         <html lang="en">
           <head>
@@ -49,16 +52,7 @@ export default async function RootLayout({
              </SidebarProvider>
               </body>
             ) :           
-            (<body>
-              <div className="m-5 fixed flex">
-                <UserButton></UserButton>
-                <h1>Current Account</h1>
-              </div>
-              <div className="w-100 h-screen flex justify-center items-center">
-                <h1 className="text-red-400 text-5xl">Awating verification </h1>
-              </div>
-
-          </body>)
+            (<Verification/>)
           }
           </ClerkProvider>
         </html>

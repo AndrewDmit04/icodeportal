@@ -15,12 +15,12 @@ export const adminContents = [
     },
     {
       title: "Time Sheets",
-      url: "#",
+      url: "/timeSheets",
       icon: TimerIcon,
     },
     {
       title: "Staff",
-      url: "#",
+      url: "/staff",
       icon: Staff,
     },
   ]

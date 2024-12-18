@@ -68,5 +68,19 @@ export async function getRole({id} : Params1) : Promise<String>{
     console.error('Error in createOrFindUser:', error);
     throw error;
   }
-  
+}
+
+export async function getAllInstructors({id} : Params1) : Promise<typeof User[]>{
+  try{
+    connectToDB();
+    const role = await getRole({id});
+    if(role !== "Director"){
+      throw new Error("Unauthorized operation")
+    }
+    const users = await User.find({role : "Instructor"})
+    return users;
+  }
+  catch(error){
+    throw error;
+  }
 }
