@@ -84,3 +84,39 @@ export async function getAllInstructors({id} : Params1) : Promise<typeof User[]>
     throw error;
   }
 }
+
+interface Params2{
+  OID : string,
+  IID : string,
+  sal : number,
+  role : string | null
+}
+
+
+export async function verifyUser({OID,IID,sal,role} : Params2) : Promise<void>{
+  connectToDB();
+  const Orole = await getRole({id : OID});
+  if(Orole !== "Director"){
+    throw new Error("Unauthorized operation")
+  }
+  await User.findOneAndUpdate(
+    {id : IID}, // Find by userId
+    { verified : true, pay : sal, role : role }, // Fields to update
+    { new: true, upsert: true, setDefaultsOnInsert: true } // Options: new document if not found
+  );
+}
+interface Params3{
+  OID : string,
+  IID : string,
+}
+
+export async function DeleteUser({OID,IID} : Params3) : Promise<void>{
+  connectToDB();
+  const Orole = await getRole({id : OID});
+  if(Orole !== "Director"){
+    throw new Error("Unauthorized operation")
+  }
+  await User.deleteOne(
+    {id : IID}, // Find by userId Options: new document if not found
+  );
+}

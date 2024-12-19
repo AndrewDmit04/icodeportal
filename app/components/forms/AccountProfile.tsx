@@ -36,8 +36,8 @@ export default function ProfileForm({user} : Props) {
   })
  
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    createOrFindUser({
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    await createOrFindUser({
         firstName : values.firstName,
         lastName: values.lastName,
         role : values.role,

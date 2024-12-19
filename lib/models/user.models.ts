@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   image: String,
   role: { type: String, required: true, default: "Instuctor" },
   onboarded: { type: Boolean, default: false },
+  pay : {type : Number, default : 0},
   verified: { type: Boolean, default: false }, // New boolean flag
 },{collection : 'users'});
 
