@@ -99,10 +99,16 @@ export async function verifyUser({OID,IID,sal,role} : Params2) : Promise<void>{
   if(Orole !== "Director"){
     throw new Error("Unauthorized operation")
   }
+  if(role === "Unverify"){
+    await User.findOneAndUpdate(
+      {id : IID}, // Find by userId
+      { verified : false}
+    );
+    return;
+  }
   await User.findOneAndUpdate(
     {id : IID}, // Find by userId
     { verified : true, pay : sal, role : role }, // Fields to update
-    { new: true, upsert: true, setDefaultsOnInsert: true } // Options: new document if not found
   );
 }
 interface Params3{

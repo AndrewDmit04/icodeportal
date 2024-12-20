@@ -51,6 +51,16 @@ const VerifiedAccountForm = ({first, handleFormSubmit, salary, setSalary,selecte
           />
           Director
           </label>
+          <label className="flex items-center gap-2">
+          <input
+              type="radio"
+              name="role"
+              value="Unverify"
+              checked={selectedOption === 'Unverify'}
+              onChange={() => handleRadioChange('Unverify')}
+          />
+          Unverify
+          </label>
       </div>
 
         <div className="flex justify-end gap-2">
