@@ -40,7 +40,7 @@ export async function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link href={item.url}>
-                      <Image src={item.icon} alt={item.title} width={24} height={24}/>
+                      <item.icon className="!w-9 !h-9"/>
                       <span className="text-3xl">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>

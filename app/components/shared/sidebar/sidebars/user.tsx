@@ -1,7 +1,5 @@
-const dashboard = "assets/dashboard.svg"
-const Calendar = "assets/calendar.svg"
-const TimerIcon = "assets/timerIcon.svg"
-const Staff = "assets/staff.svg"
+import { LayoutDashboardIcon, Calendar, Timer, User, AlarmClock  } from "lucide-react"
+
 export const userContents = [
     {
       title: "Calendar",
@@ -11,11 +9,16 @@ export const userContents = [
     {
       title: "Time Sheets",
       url: "#",
-      icon: TimerIcon,
+      icon: Timer,
     },
     {
-      title: "Staff",
+      title: "Avalible Shifts",
       url: "#",
-      icon: Staff,
+      icon: User,
+    },
+    {
+        title: "Punch Card",
+        url: "/clock",
+        icon: AlarmClock,
     },
   ]
