@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { DeleteUser, verifyUser } from '@/lib/actions/user.actions';
 import { redirect } from 'next/navigation';
 import VerifiedAccountForm from '../forms/VerifiedAccountForm';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 interface Params {
   first: string;
   last: string;
@@ -58,14 +59,45 @@ const UnVerifiedAccount = ({ first, last, img, uid, role, OID }: Params) => {
   };
 
   return (
-    <div className="flex flex-col bg-slate-100 w-40 items-center rounded-md p-2 shadow-lg transition-all border-2 border-neutral-700" key={uid}>
-      <Image className="rounded-full mb-2" src={img} alt="Profile" width={50} height={50} />
-      <h1 className="text-center">{first} {last}</h1>
-      <p className="text-gray-500">{role}</p>
-      <div className="flex gap-1">
-        <Button className="bg-green-500 hover:bg-green-800" onClick={handleAcceptClick}>Accept</Button>
-        <Button className="bg-red-500 hover:bg-red-800" onClick={handleDenyClick}>Deny</Button>
-      </div>
+    <div>
+    <Card className="w-64 transform transition-all duration-300">
+      <CardContent className="p-6 flex flex-col items-center space-y-4">
+        <div className="relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur opacity-25"></div>
+          <Image
+            className="relative rounded-full border-2 border-white shadow-md"
+            src={img}
+            alt={`${first} ${last}`}
+            width={80}
+            height={80}
+          />
+        </div>
+
+        <div className="text-center space-y-2">
+          <h2 className="font-semibold text-lg text-gray-800">
+            {first} {last}
+          </h2>
+          <p className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            {role}
+          </p>
+        </div>
+
+        <div className="flex gap-2 w-full pt-2">
+          <Button
+            onClick={handleAcceptClick}
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white shadow-sm"
+          >
+            Accept
+          </Button>
+          <Button
+            onClick={handleDenyClick}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white shadow-sm"
+          >
+            Deny
+          </Button>
+        </div>
+      </CardContent>
+      </Card>
 
       {/* Salary Popup */}
       {isSalaryPopupOpen && (
@@ -93,8 +125,10 @@ const UnVerifiedAccount = ({ first, last, img, uid, role, OID }: Params) => {
           </div>
         </div>
       )}
+    
     </div>
   );
+
 };
 
 export default UnVerifiedAccount;
