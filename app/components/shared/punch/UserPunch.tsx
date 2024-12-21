@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, Timer, CalendarClock, History, AlertCircle } from 'lucide-react';
 import { clockInOut, getClockInTime, getTodaysShifts, isClockedIn } from '@/lib/actions/stamp.actions';
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface TimeEntry {
   date: string;
@@ -11,39 +12,43 @@ interface TimeEntry {
   clockOut: string | null;
   totalHours: string;
 }
-interface Params{
-    id : string;
+interface Params {
+  id: string;
 }
-const UserPunch = ({id } : Params) => {
+
+const UserPunch = ({ id }: Params) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isWorking, setIsWorking] = useState(false);
   const [clockInTime, setClockInTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState<string>("00:00:00");
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
   const [clockInCnt, setClockInCnt] = useState(0);
-  const [hoursTdy,setHoursTdy] = useState(""); 
-  
+  const [hoursTdy, setHoursTdy] = useState(""); 
+  const [loading, setLoading] = useState(true); // Loading state
+
   const calculateTotalTime = (entries: TimeEntry[]): string => {
     const totalHours = entries.reduce((acc, curr) => acc + parseFloat(curr.totalHours), 0);
     return totalHours.toFixed(2); // Return total hours rounded to 2 decimal places
   };
   
-  useEffect(()=>{
+  useEffect(() => {
     const getClockedState = async () => {
-        const state = await isClockedIn({ id });
-        const todaysShifts : any = await getTodaysShifts({id : id})
-        setIsWorking(state);
-        setTimeEntries(todaysShifts);
-        setClockInCnt(todaysShifts.length);
-        setHoursTdy(calculateTotalTime(todaysShifts));
-        if(state){
-            const clockInTime = await getClockInTime({id})
-            setClockInTime(new Date(clockInTime));
-        }
-      };
-    
+      setLoading(true); // Start loading
+      const state = await isClockedIn({ id });
+      const todaysShifts: any = await getTodaysShifts({ id: id });
+      setIsWorking(state);
+      setTimeEntries(todaysShifts);
+      setClockInCnt(todaysShifts.length);
+      setHoursTdy(calculateTotalTime(todaysShifts));
+      if (state) {
+        const clockInTime = await getClockInTime({ id });
+        setClockInTime(new Date(clockInTime));
+      }
+      setLoading(false); // End loading
+    };
+
     getClockedState();
-  },[id])
+  }, [id]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -63,7 +68,7 @@ const UserPunch = ({id } : Params) => {
   const handleClockInOut = async () => {
     const now = new Date();
     
-    await clockInOut({id : id})
+    await clockInOut({ id: id });
     
     if (!isWorking) {
       setClockInTime(now);
@@ -79,13 +84,11 @@ const UserPunch = ({id } : Params) => {
       setTimeEntries([newEntry, ...timeEntries]);
       setClockInTime(null);
       setClockInCnt(prev => prev + 1);
-      setHoursTdy(prev => (parseFloat(prev) + hoursWorked).toString())
+      setHoursTdy(prev => (parseFloat(prev) + hoursWorked).toFixed(2).toString());
       setIsWorking(false);
       setElapsedTime("00:00:00");
     }
   };
-
-
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
@@ -98,7 +101,7 @@ const UserPunch = ({id } : Params) => {
               <div className="text-center md:text-left">
                 <p className="text-sm font-medium opacity-90">Current Time</p>
                 <h2 className="text-4xl font-bold">
-                  {currentTime.toLocaleTimeString()}
+                  {loading ? <Skeleton className="w-32 h-8" /> : currentTime.toLocaleTimeString()}
                 </h2>
               </div>
             </div>
@@ -143,7 +146,7 @@ const UserPunch = ({id } : Params) => {
                 <h3 className="font-semibold">Hours Today</h3>
               </div>
               <span className="text-2xl font-bold text-blue-500">
-                {hoursTdy}
+                {loading ? <Skeleton className="w-16 h-8" /> : hoursTdy}
               </span>
             </div>
           </CardContent>
@@ -157,7 +160,7 @@ const UserPunch = ({id } : Params) => {
                 <h3 className="font-semibold">Clock-ins Today</h3>
               </div>
               <span className="text-2xl font-bold text-purple-500">
-                {clockInCnt}
+                {loading ? <Skeleton className="w-16 h-8" /> : clockInCnt}
               </span>
             </div>
           </CardContent>
@@ -171,7 +174,9 @@ const UserPunch = ({id } : Params) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {timeEntries.length === 0 ? (
+            {loading ? (
+              <Skeleton className="w-full h-16" />
+            ) : timeEntries.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <History className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p>No time entries yet</p>
