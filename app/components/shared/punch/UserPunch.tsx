@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, Timer, CalendarClock, History, AlertCircle } from 'lucide-react';
+import { clockIn } from '@/lib/actions/stamp.actions';
 
 interface TimeEntry {
   date: string;
@@ -10,8 +11,10 @@ interface TimeEntry {
   clockOut: string | null;
   totalHours: number;
 }
-
-const UserPunch = () => {
+interface Params{
+    id : string;
+}
+const UserPunch = ({id } : Params) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isWorking, setIsWorking] = useState(false);
   const [clockInTime, setClockInTime] = useState<Date | null>(null);
@@ -34,8 +37,10 @@ const UserPunch = () => {
     return () => clearInterval(timer);
   }, [isWorking, clockInTime]);
 
-  const handleClockInOut = () => {
+  const handleClockInOut = async () => {
     const now = new Date();
+    
+    await clockIn({id : id})
     
     if (!isWorking) {
       setClockInTime(now);
