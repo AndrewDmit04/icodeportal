@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, Timer, CalendarClock, History, AlertCircle } from 'lucide-react';
-import { clockIn } from '@/lib/actions/stamp.actions';
+import { clockInOut, getClockInTime, getTodaysShifts, isClockedIn } from '@/lib/actions/stamp.actions';
 
 interface TimeEntry {
   date: string;
   clockIn: string;
   clockOut: string | null;
-  totalHours: number;
+  totalHours: string;
 }
 interface Params{
     id : string;
@@ -18,10 +18,33 @@ const UserPunch = ({id } : Params) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isWorking, setIsWorking] = useState(false);
   const [clockInTime, setClockInTime] = useState<Date | null>(null);
-  const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
   const [elapsedTime, setElapsedTime] = useState<string>("00:00:00");
+  const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
+  const [clockInCnt, setClockInCnt] = useState(0);
+  const [hoursTdy,setHoursTdy] = useState(""); 
+  
+  const calculateTotalTime = (entries: TimeEntry[]): string => {
+    const totalHours = entries.reduce((acc, curr) => acc + parseFloat(curr.totalHours), 0);
+    return totalHours.toFixed(2); // Return total hours rounded to 2 decimal places
+  };
+  
+  useEffect(()=>{
+    const getClockedState = async () => {
+        const state = await isClockedIn({ id });
+        const todaysShifts : any = await getTodaysShifts({id : id})
+        setIsWorking(state);
+        setTimeEntries(todaysShifts);
+        setClockInCnt(todaysShifts.length);
+        setHoursTdy(calculateTotalTime(todaysShifts));
+        if(state){
+            const clockInTime = await getClockInTime({id})
+            setClockInTime(new Date(clockInTime));
+        }
+      };
+    
+    getClockedState();
+  },[id])
 
-  // Update current time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -40,7 +63,7 @@ const UserPunch = ({id } : Params) => {
   const handleClockInOut = async () => {
     const now = new Date();
     
-    await clockIn({id : id})
+    await clockInOut({id : id})
     
     if (!isWorking) {
       setClockInTime(now);
@@ -51,22 +74,18 @@ const UserPunch = ({id } : Params) => {
         date: now.toLocaleDateString(),
         clockIn: clockInTime.toLocaleTimeString(),
         clockOut: now.toLocaleTimeString(),
-        totalHours: Number(hoursWorked.toFixed(2))
+        totalHours: (hoursWorked.toFixed(2))
       };
       setTimeEntries([newEntry, ...timeEntries]);
       setClockInTime(null);
+      setClockInCnt(prev => prev + 1);
+      setHoursTdy(prev => (parseFloat(prev) + hoursWorked).toString())
       setIsWorking(false);
       setElapsedTime("00:00:00");
     }
   };
 
-  const getTotalHoursToday = () => {
-    const today = new Date().toLocaleDateString();
-    return timeEntries
-      .filter(entry => entry.date === today)
-      .reduce((acc, curr) => acc + curr.totalHours, 0)
-      .toFixed(2);
-  };
+
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
@@ -124,7 +143,7 @@ const UserPunch = ({id } : Params) => {
                 <h3 className="font-semibold">Hours Today</h3>
               </div>
               <span className="text-2xl font-bold text-blue-500">
-                {getTotalHoursToday()}
+                {hoursTdy}
               </span>
             </div>
           </CardContent>
@@ -138,7 +157,7 @@ const UserPunch = ({id } : Params) => {
                 <h3 className="font-semibold">Clock-ins Today</h3>
               </div>
               <span className="text-2xl font-bold text-purple-500">
-                {timeEntries.filter(entry => entry.date === new Date().toLocaleDateString()).length}
+                {clockInCnt}
               </span>
             </div>
           </CardContent>

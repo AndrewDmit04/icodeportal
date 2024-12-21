@@ -4,13 +4,13 @@ import Stamp from "../models/stamp.models"
 import { connectToDB } from "../mongoose"
 
 interface Params{
-    id : string
+    id : string,
 }
 
 export async function isClockedIn({id} : Params) : Promise<boolean>{
     await connectToDB();
     try {
-      const latestStamp = await Stamp.findOne().sort({ lastUpdated: -1 }).exec();
+      const latestStamp = await Stamp.findOne({id}).sort({ lastUpdated: -1 }).exec();
       if (latestStamp === null){
         return false;
       }
@@ -22,30 +22,86 @@ export async function isClockedIn({id} : Params) : Promise<boolean>{
     }
 }
 
-export async function clockIn({id} : Params){
-    const currentDate = new Date()
-    if(!(await isClockedIn({id : id}))){
-        const newStamp = new Stamp({
-            id,
-            clockIn: currentDate,
-            clockOut: null,
-            lastUpdated: currentDate,
-          });
+export async function clockInOut({ id }: Params) {
+    try {
+      await connectToDB();
+      const currentDate = new Date();
       
-          await newStamp.save();
-          console.log('Created a new timestamp for the user.');
-    }
-    else{
-        console.log("updating")
+      if (!(await isClockedIn({ id }))) {
+        const newStamp = new Stamp({
+          id,
+          clockIn: currentDate,
+          clockOut: null,
+          lastUpdated: currentDate,
+        });
+  
+        await newStamp.save();
+        console.log('Created a new timestamp for the user.');
+      } else {
+        console.log("updating");
         const latestStamp = await Stamp.findOne({ id })
-        .sort({ lastUpdated: -1 }) // Sort by lastUpdated in descending order
-        .exec();
-        console.log(latestStamp)
+          .sort({ lastUpdated: -1 }) // Sort by lastUpdated in descending order
+          .exec();
+        console.log(latestStamp);
+  
         await Stamp.findByIdAndUpdate(
-            latestStamp._id, // Use the ID of the fetched document
-            { clockOut: currentDate, lastUpdated: currentDate }, // Fields to update
-            { new: true } // Return the updated document
+          latestStamp._id, // Use the ID of the fetched document
+          { clockOut: currentDate, lastUpdated: currentDate }, // Fields to update
+          { new: true } // Return the updated document
         );
         console.log("updated");
+      }
+    } catch (error) {
+      console.error("Error in clockInOut:", error);
+      throw error; // Optionally rethrow or handle error as needed
     }
-}
+  }
+  
+  export const getTodaysShifts = async ({ id }: Params) => {
+    try {
+      const today = new Date();
+      const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Start of today
+      const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // End of today
+  
+      // Query for shifts within today's range
+      const shifts = await Stamp.find({
+        id: id,
+        lastUpdated: { $gte: startOfDay, $lte: endOfDay },
+      }).sort({ lastUpdated: -1 });
+  
+      // Filter out shifts where clockOut is null
+      const validShifts = shifts.filter(shift => shift.clockOut !== null);
+  
+      return validShifts.map((shift) => {
+        const clockInTime = shift.clockIn ? new Date(shift.clockIn) : null;
+        const clockOutTime = shift.clockOut ? new Date(shift.clockOut) : null;
+  
+        const totalHours =
+          clockInTime && clockOutTime
+            ? (clockOutTime.getTime() - clockInTime.getTime()) / (1000 * 60 * 60) // Correct calculation of hours worked
+            : 0;
+  
+        return {
+          date: shift.lastUpdated.toLocaleDateString(),
+          clockIn: clockInTime ? clockInTime.toLocaleTimeString() : '',
+          clockOut: clockOutTime ? clockOutTime.toLocaleTimeString() : '',
+          totalHours: totalHours.toFixed(2), // Returning hours as a string with two decimals
+        };
+      });
+    } catch (error) {
+      console.error("Error in getTodaysShifts:", error);
+      throw error; // Optionally rethrow or handle error as needed
+    }
+  };
+  
+  export async function getClockInTime({ id }: Params) {
+    try {
+      await connectToDB();
+      const latestStamp = await Stamp.findOne({ id }).sort({ lastUpdated: -1 }).exec();
+      return latestStamp?.clockIn || null; // Return null if no clockIn time is found
+    } catch (error) {
+      console.error("Error in getClockInTime:", error);
+      throw error; // Optionally rethrow or handle error as needed
+    }
+  }
+  
