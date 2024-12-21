@@ -24,7 +24,7 @@ export const adminContents = [
     },
     {
       title: "Time Sheets",
-      url: "/timeSheets",
+      url: "/sheets",
       icon: FileSpreadsheet,
     },
   ]

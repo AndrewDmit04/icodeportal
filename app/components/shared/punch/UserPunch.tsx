@@ -101,7 +101,11 @@ const UserPunch = ({ id }: Params) => {
               <div className="text-center md:text-left">
                 <p className="text-sm font-medium opacity-90">Current Time</p>
                 <h2 className="text-4xl font-bold">
-                  {loading ? <Skeleton className="w-32 h-8" /> : currentTime.toLocaleTimeString()}
+                {loading ? (
+                    <Skeleton className="w-32 h-8" />
+                    ) : (
+                    `${(currentTime.getHours() % 12 || 12)}:${currentTime.getMinutes().toString().padStart(2, '0')}:${currentTime.getSeconds().toString().padStart(2, '0')} ${currentTime.getHours() >= 12 ? 'PM' : 'AM'}`
+                    )}
                 </h2>
               </div>
             </div>
@@ -130,7 +134,7 @@ const UserPunch = ({ id }: Params) => {
           </Button>
           {isWorking && clockInTime && (
             <p className="mt-4 text-gray-600">
-              Clocked in at {clockInTime.toLocaleTimeString()}
+              Clocked in at {`${(clockInTime.getHours() % 12 || 12)}:${clockInTime.getMinutes().toString().padStart(2, '0')}:${clockInTime.getSeconds().toString().padStart(2, '0')} ${currentTime.getHours() >= 12 ? 'PM' : 'AM'}`}
             </p>
           )}
         </CardContent>

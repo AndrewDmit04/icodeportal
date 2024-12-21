@@ -54,7 +54,7 @@ const AdminPunch = () => {
             <div>
               <p className="text-sm font-medium opacity-90">Current Time</p>
               <h2 className="text-4xl font-bold">
-                {currentTime.toLocaleTimeString()}
+                {`${(currentTime.getHours() % 12 || 12)}:${currentTime.getMinutes().toString().padStart(2, '0')}:${currentTime.getSeconds().toString().padStart(2, '0')} ${currentTime.getHours() >= 12 ? 'PM' : 'AM'}`}
               </h2>
             </div>
           </div>
