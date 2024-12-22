@@ -30,6 +30,10 @@ const UserPunch = ({ id }: Params) => {
     const totalHours = entries.reduce((acc, curr) => acc + parseFloat(curr.totalHours), 0);
     return totalHours.toFixed(2); // Return total hours rounded to 2 decimal places
   };
+
+  const getPmAm = (time : Date) =>{
+    return `${(time.getHours() % 12 || 12)}:${time.getMinutes().toString().padStart(2, '0')}:${time.getSeconds().toString().padStart(2, '0')} ${time.getHours() >= 12 ? 'PM' : 'AM'}`
+  }
   
   useEffect(() => {
     const getClockedState = async () => {
@@ -77,8 +81,8 @@ const UserPunch = ({ id }: Params) => {
       const hoursWorked = (now.getTime() - clockInTime.getTime()) / (1000 * 60 * 60);
       const newEntry: TimeEntry = {
         date: now.toLocaleDateString(),
-        clockIn: clockInTime.toLocaleTimeString(),
-        clockOut: now.toLocaleTimeString(),
+        clockIn: getPmAm(clockInTime),
+        clockOut: getPmAm(now),
         totalHours: (hoursWorked.toFixed(2))
       };
       setTimeEntries([newEntry, ...timeEntries]);
@@ -104,7 +108,7 @@ const UserPunch = ({ id }: Params) => {
                 {loading ? (
                     <Skeleton className="w-32 h-8" />
                     ) : (
-                    `${(currentTime.getHours() % 12 || 12)}:${currentTime.getMinutes().toString().padStart(2, '0')}:${currentTime.getSeconds().toString().padStart(2, '0')} ${currentTime.getHours() >= 12 ? 'PM' : 'AM'}`
+                    `${getPmAm(currentTime)}`
                     )}
                 </h2>
               </div>
@@ -134,7 +138,7 @@ const UserPunch = ({ id }: Params) => {
           </Button>
           {isWorking && clockInTime && (
             <p className="mt-4 text-gray-600">
-              Clocked in at {`${(clockInTime.getHours() % 12 || 12)}:${clockInTime.getMinutes().toString().padStart(2, '0')}:${clockInTime.getSeconds().toString().padStart(2, '0')} ${currentTime.getHours() >= 12 ? 'PM' : 'AM'}`}
+              Clocked in at {`${getPmAm(clockInTime)}`}
             </p>
           )}
         </CardContent>

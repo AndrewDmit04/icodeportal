@@ -19,7 +19,7 @@ export const adminContents = [
     },
     {
       title: "Punch Card",
-      url: "/clock",
+      url: "/punch",
       icon: AlarmClock,
     },
     {

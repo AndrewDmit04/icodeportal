@@ -14,7 +14,7 @@ export default function Calendar() {
               center: "title",
               right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
             }} // Set header toolbar options.
-            initialView="dayGridMonth" // Initial view mode of the calendar.
+            initialView="timeGridWeek" // Initial view mode of the calendar.
             editable={true} // Allow events to be edited.
             selectable={true} // Allow dates to be selectable.
             selectMirror={true} // Mirror selections visually.

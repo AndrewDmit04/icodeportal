@@ -18,7 +18,7 @@ export const userContents = [
     },
     {
         title: "Punch Card",
-        url: "/clock",
+        url: "/punch",
         icon: AlarmClock,
     },
   ]
