@@ -1,7 +1,5 @@
 "use server"
 
-
-import { time } from "console";
 import Stamp from "../models/stamp.models";
 import User from "../models/user.models"
 import { connectToDB } from "../mongoose"
@@ -134,6 +132,7 @@ interface Employee {
   name: string;
   status: 'clocked-in' | 'clocked-out';
   img : string;
+  clockedIn: Date;
 }
 
 export async function getAllInstructorsAndTimeStatus({ id }: { id: string }): Promise<Employee[]> {
@@ -154,11 +153,13 @@ export async function getAllInstructorsAndTimeStatus({ id }: { id: string }): Pr
     // Map users to the desired format
     const employees: Employee[] = users.map(user => {
       const matchingLog = timeLogs.find(log => log.id === user.id);
+      
       return {
         id: user.id,
         name: `${user.firstName} ${user.lastName}`,
         status: matchingLog ? 'clocked-in' : 'clocked-out',
         img : user.image,
+        clockedIn : matchingLog ? matchingLog.clockIn : null
       };
     });
 

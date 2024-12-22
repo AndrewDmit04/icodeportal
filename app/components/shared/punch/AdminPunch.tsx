@@ -13,6 +13,7 @@ interface Employee {
   img: string;
   name: string;
   status: 'clocked-in' | 'clocked-out';
+  clockedIn : Date | null;
 }
 interface Params {
   id: string;
@@ -26,6 +27,9 @@ const AdminPunch = ({ id }: Params) => {
   const clockInorOut = async ({ id }: Params) => {
     await clockInOut({ id: id });
   };
+  const getPmAm = (time : Date) =>{
+    return `${(time.getHours() % 12 || 12)}:${time.getMinutes().toString().padStart(2, '0')}:${time.getSeconds().toString().padStart(2, '0')} ${time.getHours() >= 12 ? 'PM' : 'AM'}`
+  }
 
   useEffect(() => {
     const populate = async () => {
@@ -54,12 +58,13 @@ const AdminPunch = ({ id }: Params) => {
     setEmployees(
       employees.map(emp => {
         if (emp.id === employeeId) {
-          const now = new Date().toLocaleTimeString();
+          const now = new Date()
           clockInorOut({ id: emp.id });
           return {
             ...emp,
             status: emp.status === 'clocked-in' ? 'clocked-out' : 'clocked-in',
-            [emp.status === 'clocked-in' ? 'clockOutTime' : 'clockInTime']: now,
+            [emp.status === 'clocked-in' ? 'clockOutTime' : 'clockInTime']: now.toLocaleString,
+            clockedIn : emp.status === 'clocked-in' ? null : now
           };
         }
         return emp;
@@ -186,6 +191,12 @@ const AdminPunch = ({ id }: Params) => {
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
+                    {employee.clockedIn ?  
+                      <div>
+                          <p>Clocked in at </p>
+                          <p>{getPmAm(employee.clockedIn)}</p>
+                      </div>
+                       : <></>}
                     <Button
                       onClick={() => handleClockInOut(employee.id)}
                       className={

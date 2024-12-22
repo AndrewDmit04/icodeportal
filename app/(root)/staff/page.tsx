@@ -1,7 +1,7 @@
 import AccountCount from '@/app/components/accounts/AccountCount';
 import UnVerrifiedAccount from '@/app/components/accounts/UnVerrifiedAccount';
 import VerrifiedAccount from '@/app/components/accounts/VerrifiedAccount';
-import { getAllInstructors, verifyUser } from '@/lib/actions/user.actions';
+import { getAllInstructors } from '@/lib/actions/user.actions';
 import { currentUser } from '@clerk/nextjs/server';
 import React from 'react';
 import { Users, UserCheck, Clock } from 'lucide-react';

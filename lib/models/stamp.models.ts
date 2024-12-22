@@ -4,6 +4,7 @@ const stampSchema = new mongoose.Schema({
   id: { type: String, required: true },
   clockIn: { type: Date, required: true },
   clockOut: { type: Date},
+  isValid : { type : Boolean, default : true},
   lastUpdated : {type : Date, required : true} // New boolean flag
 },{collection : 'Stamps'});
 

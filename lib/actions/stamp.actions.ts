@@ -36,20 +36,17 @@ export async function clockInOut({ id }: Params) {
         });
   
         await newStamp.save();
-        console.log('Created a new timestamp for the user.');
       } else {
         console.log("updating");
         const latestStamp = await Stamp.findOne({ id })
           .sort({ lastUpdated: -1 }) // Sort by lastUpdated in descending order
           .exec();
-        console.log(latestStamp);
   
         await Stamp.findByIdAndUpdate(
           latestStamp._id, // Use the ID of the fetched document
           { clockOut: currentDate, lastUpdated: currentDate }, // Fields to update
           { new: true } // Return the updated document
         );
-        console.log("updated");
       }
     } catch (error) {
       console.error("Error in clockInOut:", error);
