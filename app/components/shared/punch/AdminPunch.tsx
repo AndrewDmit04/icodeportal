@@ -179,7 +179,7 @@ const AdminPunch = ({ id }: Params) => {
                         employee.status === 'clocked-in' ? 'bg-green-500' : 'bg-red-500'
                       }`}
                     />
-                    <img src={employee.img} className="w-24 h-24 rounded-full" />
+                    <img src={employee.img} className="w-24 h-24 sm:block hidden rounded-full " />
                     <div>
                       <h4 className="font-medium">{employee.name}</h4>
                       <p className="text-sm text-gray-500">Instructor</p>

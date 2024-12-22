@@ -37,7 +37,7 @@ export default async function RootLayout({
         <head>
           <title>Portal</title>
         </head>
-        <body className="flex h-screen w-screen">
+        <body className="">
           {verified ? (
             <SidebarProvider>
               {/* Sidebar */}
