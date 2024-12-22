@@ -1,6 +1,8 @@
 "use server"
 
 
+import { time } from "console";
+import Stamp from "../models/stamp.models";
 import User from "../models/user.models"
 import { connectToDB } from "../mongoose"
 
@@ -125,4 +127,43 @@ export async function DeleteUser({OID,IID} : Params3) : Promise<void>{
   await User.deleteOne(
     {id : IID}, // Find by userId Options: new document if not found
   );
+}
+
+interface Employee {
+  id: string;
+  name: string;
+  status: 'clocked-in' | 'clocked-out';
+  img : string;
+}
+
+export async function getAllInstructorsAndTimeStatus({ id }: { id: string }): Promise<Employee[]> {
+  try {
+    await connectToDB();
+
+    // Verify the role
+    const role = await getRole({ id });
+    if (role !== "Director") {
+      throw new Error("Unauthorized operation");
+    }
+
+    // Fetch all instructors
+    const users = await User.find({ role: "Instructor" });
+    
+    // Fetch all timestamps with no clock-out time
+    const timeLogs = await Stamp.find({ clockOut: null });
+    // Map users to the desired format
+    const employees: Employee[] = users.map(user => {
+      const matchingLog = timeLogs.find(log => log.id === user.id);
+      return {
+        id: user.id,
+        name: `${user.firstName} ${user.lastName}`,
+        status: matchingLog ? 'clocked-in' : 'clocked-out',
+        img : user.image,
+      };
+    });
+
+    return employees;
+  } catch (error) {
+    throw error;
+  }
 }

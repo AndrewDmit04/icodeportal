@@ -11,7 +11,7 @@ const Clock = async() => {
   const isAdmin = role === "Director"
   return (
     <div>
-        {isAdmin ? <AdminPunch/> : <UserPunch id={user.id}/> }
+        {isAdmin ? <AdminPunch id={user.id}/> : <UserPunch id={user.id}/> }
     </div>
   )
 }
