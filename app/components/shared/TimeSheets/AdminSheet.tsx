@@ -138,7 +138,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Total Hours</p>
-                <p className="text-2xl font-bold">{loading ? <Skeleton className="w-20 h-8" /> : totalHours.toFixed(1) }</p>
+                {loading ? <Skeleton className="w-20 h-8" /> :<p className="text-2xl font-bold">{ totalHours.toFixed(1) }</p>}
               </div>
               <Clock className="w-8 h-8 text-blue-500" />
             </div>
@@ -150,7 +150,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Average Hours</p>
-                <p className="text-2xl font-bold">{loading ? <Skeleton className="w-20 h-8"/> : averageHours.toFixed(1)  }</p>
+                {loading ? <Skeleton className="w-20 h-8"/> : <p className="text-2xl font-bold">{  averageHours.toFixed(1)  }</p>}
               </div>
               <TrendingUp className="w-8 h-8 text-green-500" />
             </div>
@@ -162,7 +162,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Active Staff</p>
-                <p className="text-2xl font-bold">{loading ? <Skeleton className="w-20 h-8"/> : employees.length }</p>
+                {loading ? <Skeleton className="w-20 h-8"/> : <p className="text-2xl font-bold">{ employees.length}</p>}
               </div>
               <Users className="w-8 h-8 text-purple-500" />
             </div>
