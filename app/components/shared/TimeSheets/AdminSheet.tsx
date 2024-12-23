@@ -32,6 +32,7 @@ import {
 import { getUsersAndTimeWorked } from '@/lib/actions/user.actions';
 import ShiftManagementModal from './TimeModal';
 import {Skeleton} from "@/components/ui/skeleton" // Import Skeleton
+import { exportEmployeeReport } from './exportEmployeeReport';
 
 interface Employee {
   id: string;
@@ -52,7 +53,6 @@ const AdminHoursDashboard = ({ id }: Params) => {
   const [loading, setIsLoading] = useState(true)
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [timePeriod, setTimePeriod] = useState('this');
-  const [isNew, setIsNew] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [date, setDate] = React.useState<DateRange | undefined>(() => {
@@ -121,7 +121,6 @@ const AdminHoursDashboard = ({ id }: Params) => {
           employee={selectedEmployee}
           onClose={closePopup}
           id={id}
-          isNew={setIsNew}
         />
       )}
 
@@ -224,7 +223,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
           </Popover> : <></>
         }
         <p>from {getPmAm(date?.from)} to {getPmAm(date?.to)}</p>
-        <Button className="ml-auto">Export Report</Button>
+        <Button onClick={() => exportEmployeeReport(employees)} className="ml-auto">Export Report</Button>
       </div>
 
       {/* Main Table */}
