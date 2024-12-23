@@ -54,6 +54,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [timePeriod, setTimePeriod] = useState('this');
   const [searchQuery, setSearchQuery] = useState('');
+  const [refresh,setRefresh] = useState(true);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [date, setDate] = React.useState<DateRange | undefined>(() => {
     const today = new Date();
@@ -69,11 +70,16 @@ const AdminHoursDashboard = ({ id }: Params) => {
       if (date && date.from && date.to) {
         const instructors = await getUsersAndTimeWorked({ id: id, from: date.from, to: date.to })
         setEmployees(instructors);
+        if(selectedEmployee !== null){
+            const instructor : any = instructors.find((instructor) => instructor.id === selectedEmployee.id);
+            setSelectedEmployee(instructor);
+            console.log(instructor);
+        }
         setIsLoading(false);
       }
     }
     fetchInfo();
-  }, [date])
+  }, [date,refresh])
 
   const handleIndividualClick = (event: any) => {
     setSelectedEmployee(event)
@@ -121,6 +127,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
           employee={selectedEmployee}
           onClose={closePopup}
           id={id}
+          setRefresh={setRefresh}
         />
       )}
 

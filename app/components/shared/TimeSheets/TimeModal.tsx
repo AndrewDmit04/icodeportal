@@ -16,7 +16,8 @@ import { CreateStamp, DeleteStamp, updateStamp } from '@/lib/actions/stamp.actio
 const ShiftManagementModal = ({ 
     employee, 
     onClose,
-    id
+    id,
+    setRefresh
 } : any) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -54,6 +55,7 @@ const ShiftManagementModal = ({
         if (shiftToDelete) {
             await DeleteStamp({id : id, stamp : shiftToDelete})
             setShiftToDelete(null);
+            setRefresh((prev : boolean)=>!prev);
         }
         setIsDeleteModalOpen(false);
     };
@@ -67,6 +69,7 @@ const ShiftManagementModal = ({
             await updateStamp({ id: id, stamp: shiftData });
         }
         setIsEditModalOpen(false);
+        setRefresh((prev : boolean)=>!prev);
     };
 
     return (

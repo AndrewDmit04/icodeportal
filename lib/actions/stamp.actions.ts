@@ -120,7 +120,6 @@ export async function clockInOut({ id }: Params) {
       if(role !== "Director"){
         throw new Error("Unauthorized Action")
       }
-      console.log(stamp)
       await Stamp.findOneAndUpdate(
         {_id : stamp.id},
         {clockIn : stamp.from, clockOut : stamp.to, lastUpdated : stamp.date} )
