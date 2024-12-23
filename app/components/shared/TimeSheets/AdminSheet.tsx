@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from "@/lib/utils"
-import { addDays,subDays, format, startOfWeek } from "date-fns"
+import { addDays, subDays, format, startOfWeek } from "date-fns"
 import { DateRange } from "react-day-picker"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
@@ -30,6 +30,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { getUsersAndTimeWorked } from '@/lib/actions/user.actions';
+import ShiftManagementModal from './TimeModal';
+import {Skeleton} from "@/components/ui/skeleton" // Import Skeleton
 
 interface Employee {
   id: string;
@@ -39,74 +41,70 @@ interface Employee {
   hourlyRate: number;
   overtime: number;
   lastClockIn: string;
-  shifts : {id : string, date : Date, to : Date, from : Date }[]
-}
-interface Params{
-    id : string;
+  shifts: { id: string, date: Date, to: Date, from: Date }[]
 }
 
-const AdminHoursDashboard = ({id} : Params) => {  
+interface Params {
+  id: string;
+}
 
-  
+const AdminHoursDashboard = ({ id }: Params) => {
+  const [loading, setIsLoading] = useState(true)
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [timePeriod, setTimePeriod] = useState('this');
+  const [isNew, setIsNew] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [employees, setEmployees] = useState<Employee[]>([
-    {
-      id: '1',
-      name: 'John Doe',
-      role: 'Instructor',
-      hoursWorked: 38.5,
-      hourlyRate: 25,
-      overtime: 0,
-      lastClockIn: '2024-12-20 09:00 AM',
-      shifts : [{id : "22", date : new Date(), to : new Date(), from :  new Date }]
-    }])
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [date, setDate] = React.useState<DateRange | undefined>(() => {
     const today = new Date();
-    // Adjust to the start of the week (Monday as the start of the bi-weekly cycle)
-    const startOfBiWeekly = startOfWeek(today, { weekStartsOn: 1 }); // 1 = Monday
+    const startOfBiWeekly = startOfWeek(today, { weekStartsOn: 1 });
     return {
       from: startOfBiWeekly,
-      to: addDays(startOfBiWeekly, 13), // 13 days after the start date
+      to: addDays(startOfBiWeekly, 13),
     };
   });
-  useEffect(()=>{
-    const fetchInfo = async () =>{
-        if (date && date.from && date.to){
-            await getUsersAndTimeWorked({id : id, from : date.from, to : date.to})
-        } 
-        return
+
+  useEffect(() => {
+    const fetchInfo = async () => {
+      if (date && date.from && date.to) {
+        const instructors = await getUsersAndTimeWorked({ id: id, from: date.from, to: date.to })
+        setEmployees(instructors);
+        setIsLoading(false);
+      }
     }
     fetchInfo();
-    },[])
+  }, [date])
 
-  
-  const getPmAm = (time : Date | undefined) =>{
-    if (time){
+  const handleIndividualClick = (event: any) => {
+    setSelectedEmployee(event)
+  }
+  const closePopup = () => {
+    setSelectedEmployee(null)
+  }
+
+  const getPmAm = (time: Date | undefined) => {
+    if (time) {
       return time.toLocaleDateString();
     }
     return '';
   }
+
   const handleTimePeriodChange = (value: string) => {
     const today = new Date();
     const startOfBiWeekly = startOfWeek(today, { weekStartsOn: 1 });
     if (value === 'last') {
-      
       setDate({
         from: subDays(startOfBiWeekly, 14),
         to: startOfBiWeekly
       })
-
-    }if (value === 'this') {
+    } if (value === 'this') {
       setDate({
         from: startOfBiWeekly,
         to: addDays(startOfBiWeekly, 13),
       })
-    } 
+    }
     setTimePeriod(value);
   };
-  
-
 
   const totalHours = employees.reduce((acc, emp) => acc + emp.hoursWorked, 0);
   const averageHours = totalHours / employees.length;
@@ -118,6 +116,15 @@ const AdminHoursDashboard = ({id} : Params) => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
+      {selectedEmployee && (
+        <ShiftManagementModal
+          employee={selectedEmployee}
+          onClose={closePopup}
+          id={id}
+          isNew={setIsNew}
+        />
+      )}
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
@@ -125,7 +132,7 @@ const AdminHoursDashboard = ({id} : Params) => {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Total Hours</p>
-                <p className="text-2xl font-bold">{totalHours.toFixed(1)}</p>
+                <p className="text-2xl font-bold">{loading ? <Skeleton className="w-20 h-8" /> : totalHours.toFixed(1) }</p>
               </div>
               <Clock className="w-8 h-8 text-blue-500" />
             </div>
@@ -137,7 +144,7 @@ const AdminHoursDashboard = ({id} : Params) => {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Average Hours</p>
-                <p className="text-2xl font-bold">{averageHours.toFixed(1)}</p>
+                <p className="text-2xl font-bold">{loading ? <Skeleton className="w-20 h-8"/> : averageHours.toFixed(1)  }</p>
               </div>
               <TrendingUp className="w-8 h-8 text-green-500" />
             </div>
@@ -149,7 +156,7 @@ const AdminHoursDashboard = ({id} : Params) => {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Active Staff</p>
-                <p className="text-2xl font-bold">{employees.length}</p>
+                <p className="text-2xl font-bold">{loading ? <Skeleton className="w-20 h-8"/> : employees.length }</p>
               </div>
               <Users className="w-8 h-8 text-purple-500" />
             </div>
@@ -178,44 +185,44 @@ const AdminHoursDashboard = ({id} : Params) => {
             <SelectItem value="custom">Custom</SelectItem>
           </SelectContent>
         </Select>
-        { timePeriod === "custom" ?
-        <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            id="date"
-            variant={"outline"}
-            className={cn(
-              "w-[300px] justify-start text-left font-normal",
-              !date && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon />
-            {date?.from ? (
-              date.to ? (
-                <>
-                  {format(date.from, "LLL dd, y")} -{" "}
-                  {format(date.to, "LLL dd, y")}
-                </>
-              ) : (
-                format(date.from, "LLL dd, y")
-              )
-            ) : (
-              <span>Pick a date</span>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            initialFocus
-            mode="range"
-            defaultMonth={date?.from}
-            selected={date}
-            onSelect={setDate}
-            numberOfMonths={2}
-          />
-        </PopoverContent>
-      </Popover> : <></>
-      }
+        {timePeriod === "custom" ?
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="date"
+                variant={"outline"}
+                className={cn(
+                  "w-[300px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd, y")} -{" "}
+                      {format(date.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(date.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover> : <></>
+        }
         <p>from {getPmAm(date?.from)} to {getPmAm(date?.to)}</p>
         <Button className="ml-auto">Export Report</Button>
       </div>
@@ -232,25 +239,31 @@ const AdminHoursDashboard = ({id} : Params) => {
                 <TableHead>Employee</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Hours Worked</TableHead>
-                <TableHead>Overtime</TableHead>
                 <TableHead>Last Clock In</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredEmployees.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell className="font-medium">{employee.name}</TableCell>
-                  <TableCell>{employee.role}</TableCell>
-                  <TableCell>{employee.hoursWorked.toFixed(1)}</TableCell>
-                  <TableCell>{employee.overtime}</TableCell>
-                  <TableCell>{employee.lastClockIn}</TableCell>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5}>
+                    <Skeleton className="w-full h-10" />
+                  </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredEmployees.map((employee) => (
+                  <TableRow key={employee.id} className='cursor-pointer' onClick={() => handleIndividualClick(employee)}>
+                    <TableCell className="font-medium">{employee.name}</TableCell>
+                    <TableCell>{employee.role}</TableCell>
+                    <TableCell>{employee.hoursWorked.toFixed(1)}</TableCell>
+                    <TableCell>{employee.lastClockIn}</TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-
+                    
     </div>
   );
 };

@@ -2,6 +2,7 @@
 
 import Stamp from "../models/stamp.models"
 import { connectToDB } from "../mongoose"
+import { getRole } from "./user.actions";
 
 interface Params{
     id : string,
@@ -100,5 +101,66 @@ export async function clockInOut({ id }: Params) {
       console.error("Error in getClockInTime:", error);
       throw error; // Optionally rethrow or handle error as needed
     }
+  }
+
+  interface stamp{
+    id : string
+    from : Date;
+    to : Date;
+    date : Date;
+  }
+  interface stampFunction{
+    id : string;
+    stamp : stamp;
+  }
+  export async function updateStamp({id, stamp} : stampFunction){
+    try{
+      connectToDB(); 
+      const role = await getRole({id});
+      if(role !== "Director"){
+        throw new Error("Unauthorized Action")
+      }
+      console.log(stamp)
+      await Stamp.findOneAndUpdate(
+        {_id : stamp.id},
+        {clockIn : stamp.from, clockOut : stamp.to, lastUpdated : stamp.date} )
+    }
+    catch(Error){
+      throw(Error);
+    }
+  }
+
+  export async function DeleteStamp({id,stamp} : stampFunction ) : Promise<void>{
+    connectToDB();
+    const role = await getRole({id : id});
+    if(role !== "Director"){
+      throw new Error("Unauthorized operation")
+    }
+    await Stamp.deleteOne(
+      {_id : stamp.id},
+    );
+  }
+  interface creatingStamp{
+    OID : string;
+    UID : string;
+    stamp : stamp;
+  }
+
+  export async function CreateStamp({OID,UID,stamp}: creatingStamp)  {
+    connectToDB();
+    const role = await getRole({id : OID});
+    if(role !== "Director"){
+      throw new Error("Unauthorized operation")
+    }
+    const newStamp = new Stamp({
+      id : UID,
+      clockIn: stamp.from,
+      clockOut: stamp.to,
+      lastUpdated: stamp.date,
+    });
+
+    await newStamp.save();
+    
+    
   }
   

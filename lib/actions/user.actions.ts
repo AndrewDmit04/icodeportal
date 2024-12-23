@@ -3,6 +3,7 @@
 import Stamp from "../models/stamp.models";
 import User from "../models/user.models"
 import { connectToDB } from "../mongoose"
+import { format } from 'date-fns';
 
 
 interface Params {
@@ -193,10 +194,59 @@ interface EmployeeTimes {
   shifts: Shift[];
 }
 
-export async function getUsersAndTimeWorked({id,from,to} : UserDates){
-    const instructors = await getAllInstructors({id});
-    const timestamps = await Stamp.find({
-      lastUpdated: { $gte: from, $lte: to },
-    });
-    console.log(timestamps);
+export async function getUsersAndTimeWorked({id,from,to} : UserDates) : Promise<EmployeeTimes[]>{
+    try{
+      const instructors = await getAllInstructors({id});
+      const timestamps = await Stamp.find({
+        lastUpdated: { $gte: from, $lte: to },
+      });
+      
+      const groupedTimestamps = timestamps.reduce((acc, timestamp) => {
+        if (!acc[timestamp.id]) {
+          acc[timestamp.id] = [];
+        }
+        acc[timestamp.id].push(timestamp);
+        return acc;
+      }, {} as Record<string, typeof timestamps>);
+    
+      // Map instructors to employees with their respective timestamps
+      const employees: EmployeeTimes[] = instructors.map((instructor : any) => {
+        const instructorTimestamps = groupedTimestamps[instructor.id] || [];
+    
+        const shifts = instructorTimestamps.map((timestamp : any) => ({
+          id: timestamp._id.toString(),
+          date: timestamp.lastUpdated,
+          from: timestamp.clockIn,
+          to: timestamp.clockOut,
+        }));
+    
+        const totalHours = instructorTimestamps.reduce((total : any, timestamp : any) => {
+          const hours =
+            (new Date(timestamp.clockOut).getTime() - new Date(timestamp.clockIn).getTime()) /
+            (1000 * 60 * 60);
+          return total + hours;
+        }, 0);
+    
+        const overtime = totalHours > 40 ? totalHours - 40 : 0;
+    
+        const lastClockIn = instructorTimestamps.length
+          ? format(new Date(instructorTimestamps[instructorTimestamps.length - 1].clockIn), 'yyyy-MM-dd HH:mm:ss')
+          : 'N/A';
+    
+        return {
+          id: instructor.id,
+          name: `${instructor.firstName} ${instructor.lastName}`,
+          role: instructor.role,
+          hoursWorked: totalHours,
+          hourlyRate: instructor.pay,
+          overtime,
+          lastClockIn,
+          shifts,
+        };
+      });
+      return (employees);
+    }
+    catch(error){
+      throw(error);
+    }
 }
