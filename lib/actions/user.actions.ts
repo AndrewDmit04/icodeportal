@@ -197,10 +197,10 @@ interface EmployeeTimes {
 export async function getUsersAndTimeWorked({id,from,to} : UserDates) : Promise<EmployeeTimes[]>{
     try{
       const instructors = await getAllInstructors({id});
-      const timestamps = await Stamp.find({
+      let timestamps = await Stamp.find({
         lastUpdated: { $gte: from, $lte: to },
       });
-      
+      timestamps = timestamps.filter(shift => shift.clockOut !== null);
       const groupedTimestamps = timestamps.reduce((acc, timestamp) => {
         if (!acc[timestamp.id]) {
           acc[timestamp.id] = [];
