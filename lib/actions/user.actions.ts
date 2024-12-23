@@ -168,3 +168,35 @@ export async function getAllInstructorsAndTimeStatus({ id }: { id: string }): Pr
     throw error;
   }
 }
+
+
+interface UserDates{
+  id : string
+  from : Date | undefined
+  to : Date | undefined
+}
+interface Shift {
+  _id : string;
+  id: string;
+  date: Date;
+  to: Date;
+  from: Date;
+}
+interface EmployeeTimes {
+  id: string;
+  name: string;
+  role: string;
+  hoursWorked: number;
+  hourlyRate: number;
+  overtime: number;
+  lastClockIn: string;
+  shifts: Shift[];
+}
+
+export async function getUsersAndTimeWorked({id,from,to} : UserDates){
+    const instructors = await getAllInstructors({id});
+    const timestamps = await Stamp.find({
+      lastUpdated: { $gte: from, $lte: to },
+    });
+    console.log(timestamps);
+}
