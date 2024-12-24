@@ -8,7 +8,7 @@ export const userContents = [
     },
     {
       title: "Time Sheets",
-      url: "#",
+      url: "/sheets",
       icon: Timer,
     },
     {

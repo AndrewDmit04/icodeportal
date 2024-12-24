@@ -162,4 +162,34 @@ export async function clockInOut({ id }: Params) {
     
     
   }
+  interface getUserStamps{
+    UID : string
+    id : string,
+    from : Date,
+    to : Date
+
+  }
+
+  export async function getUserStamps({UID, id, from, to} : getUserStamps){
+    try{
+      if(UID != id){
+        throw Error("Unauthorized Action");
+      }
+      const timestamps = await Stamp.find({
+        id : id,
+        lastUpdated: {$gte: from, $lte: to },
+      }).lean();
+      const formattedStamps: stamp[] = timestamps.map((timestamp) => ({
+        id: timestamp.id,
+        from: timestamp.clockIn,
+        to: timestamp.clockOut,
+        date: timestamp.lastUpdated,
+      }));
+      return formattedStamps;
+
+    }
+    catch(error){
+      throw(error)
+    }
+  }
   
