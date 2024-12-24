@@ -7,14 +7,14 @@ export const userContents = [
       icon: Calendar,
     },
     {
-      title: "Time Sheets",
-      url: "/sheets",
-      icon: Timer,
-    },
-    {
       title: "Avalible Shifts",
       url: "#",
       icon: User,
+    },
+    {
+      title: "Time Sheets",
+      url: "/sheets",
+      icon: Timer,
     },
     {
         title: "Punch Card",
