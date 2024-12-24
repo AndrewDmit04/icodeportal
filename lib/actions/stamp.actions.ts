@@ -175,10 +175,11 @@ export async function clockInOut({ id }: Params) {
       if(UID != id){
         throw Error("Unauthorized Action");
       }
-      const timestamps = await Stamp.find({
+      let timestamps = await Stamp.find({
         id : id,
         lastUpdated: {$gte: from, $lte: to },
       }).lean();
+      timestamps = timestamps.filter(shift => shift.clockOut !== null);
       const formattedStamps: stamp[] = timestamps.map((timestamp) => ({
         id: timestamp.id,
         from: timestamp.clockIn,
