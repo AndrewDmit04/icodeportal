@@ -185,7 +185,7 @@ export async function clockInOut({ id }: Params) {
         from: timestamp.clockIn,
         to: timestamp.clockOut,
         date: timestamp.lastUpdated,
-      }));
+      })).reverse();
       return formattedStamps;
 
     }

@@ -90,7 +90,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
 
   const getPmAm = (time: Date | undefined) => {
     if (time) {
-      return time.toLocaleDateString();
+      return time.toLocaleDateString("en-US");
     }
     return '';
   }

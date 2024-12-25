@@ -220,9 +220,9 @@ const UserHoursDashboard = ({ id }: Params) => {
                   </TableCell>
                 </TableRow>
               ) : (
-                shifts.map((shift) => (
-                  <TableRow key={shift.id} className='cursor-pointer'>
-                    <TableCell className="font-medium">{shift.date.toLocaleDateString()}</TableCell>
+                shifts.map((shift,ind) => (
+                  <TableRow key={ind} className='cursor-pointer'>
+                    <TableCell className="font-medium">{shift.date.toLocaleDateString("en-US")}</TableCell>
                     <TableCell>{shift.from.toLocaleTimeString()}</TableCell>
                     <TableCell>{shift.to.toLocaleTimeString()}</TableCell>
                     <TableCell>{getDuration(shift.from,shift.to)}</TableCell>

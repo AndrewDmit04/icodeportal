@@ -218,7 +218,7 @@ export async function getUsersAndTimeWorked({id,from,to} : UserDates) : Promise<
           date: timestamp.lastUpdated,
           from: timestamp.clockIn,
           to: timestamp.clockOut,
-        }));
+        })).reverse();
     
         const totalHours = instructorTimestamps.reduce((total : any, timestamp : any) => {
           const hours =
@@ -230,7 +230,7 @@ export async function getUsersAndTimeWorked({id,from,to} : UserDates) : Promise<
         const overtime = totalHours > 40 ? totalHours - 40 : 0;
     
         const lastClockIn = instructorTimestamps.length
-          ? format(new Date(instructorTimestamps[instructorTimestamps.length - 1].clockIn), 'yyyy-MM-dd HH:mm:ss')
+          ? format(new Date(instructorTimestamps[instructorTimestamps.length - 1].clockIn), 'MM-dd-yyyy HH:mm:ss')
           : 'N/A';
     
         return {
