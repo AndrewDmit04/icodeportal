@@ -3,16 +3,6 @@ import { LayoutDashboardIcon, Calendar, Timer, User, AlarmClock, FileSpreadsheet
 
 export const adminContents = [
     {
-      title: "DashBoard",
-      url: "/",
-      icon: LayoutDashboardIcon,
-    },
-    {
-      title: "Calendar",
-      url: "/calendar",
-      icon: Calendar,
-    },
-    {
       title: "Staff",
       url: "/staff",
       icon: User,
