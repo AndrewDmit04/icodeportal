@@ -6,8 +6,10 @@ import React from 'react';
 import { Users, UserCheck, Clock } from 'lucide-react';
 import { getSession } from '@auth0/nextjs-auth0';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 const Staff = async () => {
+  const co = await cookies();
   const session = await getSession();
   if (!session) {
     redirect("/api/auth/login");
