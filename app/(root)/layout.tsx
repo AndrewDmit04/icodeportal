@@ -8,10 +8,10 @@ import Verification from "../components/shared/Verification";
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { getSession } from '@auth0/nextjs-auth0';
 
-export const metadata: Metadata = {
-  title: "Portal",
-  description: "",
-};
+export const metadata ={
+  title : "Portal",
+  description : "A Next.js icode Portal Application"
+}
 
 export default async function RootLayout({
   children,
