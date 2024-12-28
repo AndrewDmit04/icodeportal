@@ -1,13 +1,21 @@
-import React from 'react'
+'use client';
 
+import { useUser } from '@auth0/nextjs-auth0/client';
 
+export default function ProfileClient() { 
+  const { user, error, isLoading } = useUser();
 
-const DashBoard = async () => {
-
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
 
   return (
-    <div>DashBoard</div>
-  )
+    user && (
+      <div>
+        <img src={user.picture ?? undefined} alt={user.name ?? ""} />
+        <h2>{user.name}</h2>
+        <p>{user.sub}</p>
+        <p>{user.email}</p>
+      </div>
+    )
+  );
 }
-
-export default DashBoard
