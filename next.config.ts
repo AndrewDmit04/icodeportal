@@ -1,3 +1,5 @@
+import { hostname } from "os";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -23,6 +25,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "placehold.co",
       },
+      {
+        protocol : "https",
+        hostname : "lh3.googleusercontent.com"
+      },
+      {
+        protocol : "https",
+        hostname : "s.gravatar.com"
+      }
     ],
   },
 };

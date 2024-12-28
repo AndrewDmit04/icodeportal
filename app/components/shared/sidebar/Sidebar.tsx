@@ -20,10 +20,11 @@ import { getRole } from "@/lib/actions/user.actions"
 import { currentUser } from "@clerk/nextjs/server"
 
 export async function AppSidebar() {
-  const user = await currentUser();
-  if(!user){return}
-  const role = await getRole({id : user.id});
-  const items = role === "Director" ? adminContents : userContents;
+  // const user = await currentUser();
+  // if(!user){return}
+  // const role = await getRole({id : user.id});
+  // const items = role === "Director" ? adminContents : userContents;
+  const items = adminContents
   return (
     <Sidebar>
       <SidebarContent>
@@ -51,10 +52,10 @@ export async function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-            <div className="flex gap-2 w-10 items-center">
-                <UserButton></UserButton>
-                <p className="text-3xl">Account</p>
-            </div>
+
+
+                <Link className="text-center text-white bg-red-500 rounded-sm hover:bg-red-400 transition-all" href={"/api/auth/logout"}>LogOut</Link>
+
             
         </SidebarFooter>
     </Sidebar>
