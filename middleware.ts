@@ -8,6 +8,9 @@ export function middleware(request: NextRequest) {
   // Example: Add a custom header to the response
   const response = NextResponse.next();
   response.headers.set('X-Custom-Header', 'Hello from middleware');
+  if (request.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/punch', request.url));
+  }
 
   return response;
 }
