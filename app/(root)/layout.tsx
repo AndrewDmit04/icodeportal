@@ -7,6 +7,12 @@ import { redirect } from "next/navigation";
 import Verification from "../components/shared/Verification";
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { getSession } from '@auth0/nextjs-auth0';
+import { usePathname } from "next/navigation";
+
+const pathname = usePathname();
+if (pathname === "/") {
+  redirect("/punch");
+}
 
 export const metadata ={
   title : "Portal",
