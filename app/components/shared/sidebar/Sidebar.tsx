@@ -14,10 +14,8 @@ import {
   SidebarMenuItem,
   SidebarFooter
 } from "@/components/ui/sidebar"
-import { UserButton } from "@clerk/nextjs"
 import Image from "next/image"
-import { getRole } from "@/lib/actions/user.actions"
-import { currentUser } from "@clerk/nextjs/server"
+
 
 export async function AppSidebar() {
   // const user = await currentUser();

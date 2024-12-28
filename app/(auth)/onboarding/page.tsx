@@ -1,39 +1,21 @@
 
 import ProfileForm from '@/app/components/forms/AccountProfile'
-import React, { useEffect } from 'react'
-import { createOrFindUser } from '@/lib/actions/user.actions'
-import { currentUser } from '@clerk/nextjs/server'
+import React from 'react'
 import { redirect } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
-import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { getSession } from '@auth0/nextjs-auth0';
 import { cookies } from 'next/headers';
 import Link from 'next/link'
-import { handleLogout } from '@auth0/nextjs-auth0';
-import { Button } from '@/components/ui/button'
+
 
 
 
 const page = async () => {
-  const sessionCookies = await cookies();
 
-  const logoutOfSession = async () =>{
-    
-  }
-
-  // Use the session cookies or get the session
   const session = await getSession();
-
-  // console.log(sessionCookies.getAll()); // Safely access cookies
-  // const user = await currentUser();
   if (!session) {
     redirect("/api/auth/login");
   }
   const user = session.user;
-
-  
-  // const user = await currentUser();
-  // if(!user){redirect('/sign-in')}
   
   const userData = {
     id : user.sub,
