@@ -71,6 +71,20 @@ export async function getRole({id} : Params1) : Promise<String>{
   }
 }
 
+export async function getAllUnverifiedInstructors({id} : Params1) : Promise<typeof User[]>{
+  try{
+    connectToDB();
+    const role = await getRole({id});
+    if(role !== "Director"){
+      throw new Error("Unauthorized operation")
+    }
+    const users = await User.find({role : "Instructor", verified : false});
+    return users;
+  }
+  catch(error){
+    throw error;
+  }
+}
 export async function getAllInstructors({id} : Params1) : Promise<typeof User[]>{
   try{
     connectToDB();
@@ -78,7 +92,7 @@ export async function getAllInstructors({id} : Params1) : Promise<typeof User[]>
     if(role !== "Director"){
       throw new Error("Unauthorized operation")
     }
-    const users = await User.find({role : "Instructor"})
+    const users = await User.find({role : "Instructor", verified : true});
     return users;
   }
   catch(error){
@@ -147,7 +161,7 @@ export async function getAllInstructorsAndTimeStatus({ id }: { id: string }): Pr
     }
 
     // Fetch all instructors
-    const users = await User.find({ role: "Instructor" });
+    const users = await User.find({ role: "Instructor", verified: true });
     
     // Fetch all timestamps with no clock-out time
     const timeLogs = await Stamp.find({ clockOut: null });

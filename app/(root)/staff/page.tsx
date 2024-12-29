@@ -1,7 +1,7 @@
 import AccountCount from '@/app/components/accounts/AccountCount';
 import UnVerrifiedAccount from '@/app/components/accounts/UnVerrifiedAccount';
 import VerrifiedAccount from '@/app/components/accounts/VerrifiedAccount';
-import { getAllInstructors } from '@/lib/actions/user.actions';
+import { getAllInstructors, getAllUnverifiedInstructors } from '@/lib/actions/user.actions';
 import { currentUser } from '@clerk/nextjs/server';
 import React from 'react';
 import { Users, UserCheck, Clock } from 'lucide-react';
@@ -10,10 +10,9 @@ const Staff = async () => {
   const user = await currentUser();
   if (!user) return null;
 
-  const currentStaff = await getAllInstructors({ id: user.id });
+  const verifiedStaff = await getAllInstructors({ id: user.id });
+  const unverifiedStaff = await getAllUnverifiedInstructors({ id: user.id });
 
-  const verifiedStaff = currentStaff.filter((staff: any) => staff.verified);
-  const unverifiedStaff = currentStaff.filter((staff: any) => !staff.verified);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">

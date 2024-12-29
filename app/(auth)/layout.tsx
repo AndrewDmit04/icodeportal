@@ -15,14 +15,13 @@ export default function RootLayout({
     
     
     return (
-        
-        <html lang="en">
-            <ClerkProvider>
-                <body className={`${inter.className} bg-dark-3`}>
-                    {children}
-                </body>
-            </ClerkProvider>
-        </html>
+        <ClerkProvider>
+            <html lang="en">
+                    <body className={`${inter.className} bg-dark-3`}>
+                        {children}
+                    </body>
+            </html>
+        </ClerkProvider>
         
     );
 }
