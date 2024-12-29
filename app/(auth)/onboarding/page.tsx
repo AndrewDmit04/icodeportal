@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import { createOrFindUser } from '@/lib/actions/user.actions'
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
+import { SignOutButton, UserButton } from '@clerk/nextjs'
 const page = async () => {
   const user = await currentUser();
   if(!user){redirect('/sign-in')}
@@ -15,10 +15,15 @@ const page = async () => {
   }
   return (
     <>
-      <div className='flex'>
-        <UserButton/>
-        <h1>Current account</h1>
-      </div>
+        <div className="m-5 fixed flex flex-col justify-center items-center gap-1 w-full">
+            <div className='flex gap-2 items-center'>
+              <UserButton></UserButton>
+              <h1>Current Account</h1>
+            </div>
+            <SignOutButton>
+              <button className='p-2 bg-red-500 rounded-md text-white'>Sign Out</button>
+            </SignOutButton>
+        </div>
       
       <div className='flex w-100 h-screen align items-center justify-center'>
         <div>

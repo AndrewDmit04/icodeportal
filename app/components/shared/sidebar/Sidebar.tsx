@@ -14,7 +14,7 @@ import {
   SidebarMenuItem,
   SidebarFooter
 } from "@/components/ui/sidebar"
-import { UserButton } from "@clerk/nextjs"
+import { SignOutButton, UserButton } from "@clerk/nextjs"
 import Image from "next/image"
 import { getRole } from "@/lib/actions/user.actions"
 import { currentUser } from "@clerk/nextjs/server"
@@ -29,9 +29,14 @@ export async function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
-            <div className="flex gap-2">
-                <Image src="/assets/icode.jpg" alt="nice" width={35} height={35}></Image>
-                <h1 className="text-black text-xl">Portal</h1>
+            <div className="flex justify-between w-full gap-2">
+                <div className="flex items-center gap-2">
+                  <Image src="/assets/icode.jpg" alt="nice" width={35} height={35}></Image>
+                  <h1 className="text-black text-xl">Portal</h1>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <UserButton></UserButton>
+                </div>
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -51,9 +56,10 @@ export async function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-            <div className="flex gap-2 w-10 items-center">
-                <UserButton></UserButton>
-                <p className="text-3xl">Account</p>
+            <div className="flex flex-col gap-2 w-full items-center justify-center">
+                <SignOutButton>
+                  <button className='p-2 bg-red-500 rounded-md text-white w-full'>Sign Out</button>
+                </SignOutButton>
             </div>
             
         </SidebarFooter>
