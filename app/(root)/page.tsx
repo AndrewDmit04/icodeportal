@@ -1,19 +1,15 @@
-'use client';
-
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { redirect } from 'next/navigation';
+import React from 'react'
 
 
-export default function ProfileClient() { 
-  const { user, error, isLoading } = useUser();
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
-  redirect("punch");
+
+
+const DashBoard = async () => {
+
+
   return (
-    user && (
-      <div>
-
-      </div>
-    )
-  );
+    <div>DashBoard</div>
+  )
 }
+
+export default DashBoard
+

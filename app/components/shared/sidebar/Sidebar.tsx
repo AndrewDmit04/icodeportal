@@ -14,23 +14,28 @@ import {
   SidebarMenuItem,
   SidebarFooter
 } from "@/components/ui/sidebar"
-import Image from "next/image"
+import { SignOutButton, UserButton } from "@clerk/nextjs"
+
 
 
 export async function AppSidebar() {
-  // const user = await currentUser();
-  // if(!user){return}
-  // const role = await getRole({id : user.id});
-  // const items = role === "Director" ? adminContents : userContents;
-  const items = adminContents
+  const user = await currentUser();
+  if(!user){return}
+  const role = await getRole({id : user.id});
+  const items = role === "Director" ? adminContents : userContents;
   return (
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
-            <div className="flex gap-2">
-                <Image src="/assets/icode.jpg" alt="nice" width={35} height={35}></Image>
-                <h1 className="text-black text-xl">Portal</h1>
+            <div className="flex justify-between w-full gap-2">
+                <div className="flex items-center gap-2">
+                  <Image src="/assets/icode.jpg" alt="nice" width={35} height={35}></Image>
+                  <h1 className="text-black text-xl">Portal</h1>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <UserButton></UserButton>
+                </div>
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -50,10 +55,11 @@ export async function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-
-
-                <Link className="text-center text-white bg-red-500 rounded-sm hover:bg-red-400 transition-all" href={"/api/auth/logout"}>LogOut</Link>
-
+            <div className="flex flex-col gap-2 w-full items-center justify-center">
+                <SignOutButton>
+                  <button className='p-2 bg-red-500 rounded-md text-white w-full'>Sign Out</button>
+                </SignOutButton>
+            </div>
             
         </SidebarFooter>
     </Sidebar>

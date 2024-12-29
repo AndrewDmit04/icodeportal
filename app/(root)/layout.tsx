@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import "../globals.css";
+import { ClerkProvider, UserButton } from "@clerk/nextjs";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "../components/shared/sidebar/Sidebar";
 import { getUser } from "@/lib/actions/user.actions";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Verification from "../components/shared/Verification";
-import { UserProvider } from '@auth0/nextjs-auth0/client';
-import { getSession } from '@auth0/nextjs-auth0';
 
 
 
@@ -15,18 +15,18 @@ export const metadata ={
   description : "A Next.js icode Portal Application"
 }
 
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
-  if (!session) {
-    redirect("/api/auth/login");
+  const user = await currentUser();
+  if (!user) {
+    redirect("/sign-in");
   }
-  const user = session.user;
 
-  const monUser: any = await getUser({ id: user.sub });
+  const monUser: any = await getUser({ id: user.id });
   if (!monUser || !monUser.onboarded) {
     redirect("/onboarding");
     return null;
@@ -35,9 +35,8 @@ export default async function RootLayout({
   const verified = monUser.verified;
 
   return (
-    // <ClerkProvider>
+    <ClerkProvider>
       <html lang="en">
-        <UserProvider>
         <head>
           <title>Portal</title>
         </head>
@@ -52,11 +51,10 @@ export default async function RootLayout({
               <div className="flex-1 overflow-auto p-4">{children}</div>
             </SidebarProvider>
           ) : (
-            <Verification user={user}/>
+            <Verification />
           )}
         </body>
-        </UserProvider>
       </html>
-
+    </ClerkProvider>
   );
 }
