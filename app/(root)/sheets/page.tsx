@@ -9,7 +9,7 @@ const Sheet = async() => {
 
   const user = await currentUser();
     if(!user){return}
-
+    const role = await getRole({id : user.id});
   const isAdmin = role === "Director"
   return (
     <div>

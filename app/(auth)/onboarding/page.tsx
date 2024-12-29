@@ -4,6 +4,7 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 
 import { SignOutButton, UserButton } from '@clerk/nextjs'
+import { currentUser } from '@clerk/nextjs/server'
 const page = async () => {
   const user = await currentUser();
   if(!user){redirect('/sign-in')}

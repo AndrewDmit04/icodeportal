@@ -15,7 +15,9 @@ import {
   SidebarFooter
 } from "@/components/ui/sidebar"
 import { SignOutButton, UserButton } from "@clerk/nextjs"
-
+import { currentUser } from "@clerk/nextjs/server"
+import { getRole } from "@/lib/actions/user.actions"
+import Image from "next/image"
 
 
 export async function AppSidebar() {
