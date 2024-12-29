@@ -11,6 +11,7 @@ const Staff = async () => {
   if (!user) return null;
 
   const currentStaff = await getAllInstructors({ id: user.id });
+
   const verifiedStaff = currentStaff.filter((staff: any) => staff.verified);
   const unverifiedStaff = currentStaff.filter((staff: any) => !staff.verified);
 

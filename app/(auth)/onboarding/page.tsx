@@ -1,13 +1,13 @@
 
 import ProfileForm from '@/app/components/forms/AccountProfile'
-import React, { useEffect } from 'react'
-import { createOrFindUser } from '@/lib/actions/user.actions'
-import { currentUser } from '@clerk/nextjs/server'
+import React from 'react'
 import { redirect } from 'next/navigation'
+
 import { SignOutButton, UserButton } from '@clerk/nextjs'
 const page = async () => {
   const user = await currentUser();
   if(!user){redirect('/sign-in')}
+
   
   const userData = {
     id : user.id,
