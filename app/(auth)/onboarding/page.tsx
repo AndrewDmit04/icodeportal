@@ -5,15 +5,18 @@ import { redirect } from 'next/navigation'
 
 import { SignOutButton, UserButton } from '@clerk/nextjs'
 import { currentUser } from '@clerk/nextjs/server'
+import { isVerrified } from '@/lib/actions/user.actions'
 const page = async () => {
   const user = await currentUser();
   if(!user){redirect('/sign-in')}
 
-  
+  const ver = await isVerrified({id : user.id})
+  if(ver){redirect('/')}
   const userData = {
     id : user.id,
     image : user.imageUrl
   }
+
   return (
     <>
         <div className="m-5 fixed flex flex-col justify-center items-center gap-1 w-full">

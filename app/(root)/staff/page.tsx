@@ -9,7 +9,6 @@ import { Users, UserCheck, Clock } from 'lucide-react';
 const Staff = async () => {
   const user = await currentUser();
   if (!user) return null;
-
   const verifiedStaff = await getAllInstructors({ id: user.id });
   const unverifiedStaff = await getAllUnverifiedInstructors({ id: user.id });
 
