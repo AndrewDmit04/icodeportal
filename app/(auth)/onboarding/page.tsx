@@ -12,8 +12,8 @@ const page = async () => {
 
 
 
-  // const ver = await isVerrified({id : user.id})
-  // if(ver){redirect('/')}
+  const ver = await isVerrified({id : user.id})
+  if(ver){redirect('/')}
   
   const userData = {
     id : user.id,
