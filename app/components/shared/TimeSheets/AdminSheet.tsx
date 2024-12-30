@@ -113,8 +113,10 @@ const AdminHoursDashboard = ({ id }: Params) => {
   };
 
   const totalHours = employees.reduce((acc, emp) => acc + emp.hoursWorked, 0);
-  const averageHours = totalHours / employees.length;
-
+  let averageHours = totalHours / employees.length;
+  if (isNaN(averageHours)) {
+    averageHours = 0;
+  }
   const filteredEmployees = employees.filter(emp =>
     emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     emp.role.toLowerCase().includes(searchQuery.toLowerCase())
