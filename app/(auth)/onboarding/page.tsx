@@ -10,8 +10,11 @@ const page = async () => {
   const user = await currentUser();
   if(!user){redirect('/sign-in')}
 
-  const ver = await isVerrified({id : user.id})
-  if(ver){redirect('/')}
+
+
+  // const ver = await isVerrified({id : user.id})
+  // if(ver){redirect('/')}
+  
   const userData = {
     id : user.id,
     image : user.imageUrl
