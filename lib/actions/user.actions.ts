@@ -51,6 +51,7 @@ export async function isVerrified({id} : Params1) : Promise<boolean>{
   try{
     connectToDB();
     const user = await User.findOne({"id" : id});
+    if(!user) return false;
     return user.verified;
   }
   catch (error) {
@@ -63,6 +64,7 @@ export async function getRole({id} : Params1) : Promise<String>{
   try{
     connectToDB();
     const user = await User.findOne({"id" : id});
+    if(!user) return "Unauthorized";
     return user.role;
   }
   catch (error) {
@@ -78,7 +80,7 @@ export async function getAllUnverifiedInstructors({id} : Params1) : Promise<type
     if(role !== "Director"){
       throw new Error("Unauthorized operation")
     }
-    const users = await User.find({role : "Instructor", verified : false});
+    const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: false });
     return users;
   }
   catch(error){
