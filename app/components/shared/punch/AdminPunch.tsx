@@ -223,55 +223,58 @@ const AdminPunch = ({ id, locations }: Params1) => {
               <Skeleton key={idx} className="h-16 w-full mb-4" />
             ))
           ) : (
-            <div className="flex  gap-4  flex-wrap">
-              {filteredEmployees.map(employee => (
-                <div
-                  key={employee.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors w-96"
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-3 h-3 rounded-full ${
-                        employee.status === 'clocked-in' ? 'bg-green-500' : 'bg-red-500'
-                      }`}
-                    />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {filteredEmployees.map(employee => (
+              <div
+                key={employee.id}
+                className="flex flex-col h-full p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex items-start gap-4 mb-4">
+                  <div
+                    className={`w-3 h-3 rounded-full mt-1 ${
+                      employee.status === 'clocked-in' ? 'bg-green-500' : 'bg-red-500'
+                    }`}
+                  />
+                  <div className="relative w-16 h-16">
                     <Image
-                      className="relative rounded-full border-2 border-white shadow-md"
+                      className="rounded-full border-2 border-white shadow-md object-cover"
                       src={employee.img}
                       alt={`${employee.name}`}
-                      width={80}
-                      height={80}
+                      fill
+                      sizes="64px"
                       priority
                     />
-                    <div>
-                      <h4 className="font-medium">{employee.name}</h4>
-                      <p className="text-sm text-gray-500">Instructor</p>
-                      <p className="text-sm text-gray-500">
-                        Location: {locations.find((item) => item.id === employee.location)?.name}
-                      </p>
-                    </div>
                   </div>
-                  <div className="flex items-center gap-6">
-                    {employee.clockedIn && (
-                      <div>
-                        <p>Clocked in at</p>
-                        <p>{getPmAm(employee.clockedIn)}</p>
-                      </div>
-                    )}
-                    <Button
-                      onClick={() => handleClockInOut(employee.id)}
-                      className={
-                        employee.status === 'clocked-in'
-                          ? 'bg-red-500 hover:bg-red-600'
-                          : 'bg-green-500 hover:bg-green-600'
-                      }
-                    >
-                      {employee.status === 'clocked-in' ? 'Clock Out' : 'Clock In'}
-                    </Button>
+                  <div className="flex-1">
+                    <h4 className="font-medium">{employee.name}</h4>
+                    <p className="text-sm text-gray-500">Instructor</p>
+                    <p className="text-sm text-gray-500">
+                      Location: {locations.find((item) => item.id === employee.location)?.name}
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="mt-auto flex flex-col gap-3">
+                  {employee.clockedIn && (
+                    <div className="text-sm">
+                      <p className="text-gray-600">Clocked in at</p>
+                      <p className="font-medium">{getPmAm(employee.clockedIn)}</p>
+                    </div>
+                  )}
+                  <Button
+                    onClick={() => handleClockInOut(employee.id)}
+                    variant="default"
+                    className={`w-full ${
+                      employee.status === 'clocked-in'
+                        ? 'bg-red-500 hover:bg-red-600'
+                        : 'bg-green-500 hover:bg-green-600'
+                    }`}
+                  >
+                    {employee.status === 'clocked-in' ? 'Clock Out' : 'Clock In'}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
           )}
         </CardContent>
       </Card>
