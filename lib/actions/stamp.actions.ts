@@ -7,9 +7,14 @@ import { getRole } from "./user.actions";
 interface Params{
     id : string,
 }
-
+let connected = false;
+if(!connected){
+  connectToDB();
+  connected = true;
+  console.log("Connection For Stamps");
+}
 export async function isClockedIn({id} : Params) : Promise<boolean>{
-    await connectToDB();
+    //await connectToDB();
     try {
       const latestStamp = await Stamp.findOne({id}).sort({ lastUpdated: -1 }).exec();
       if (latestStamp === null){
@@ -25,7 +30,7 @@ export async function isClockedIn({id} : Params) : Promise<boolean>{
 
 export async function clockInOut({ id }: Params) {
     try {
-      await connectToDB();
+      //await connectToDB();
       const currentDate = new Date();
       
       if (!(await isClockedIn({ id }))) {
@@ -94,7 +99,7 @@ export async function clockInOut({ id }: Params) {
   
   export async function getClockInTime({ id }: Params) {
     try {
-      await connectToDB();
+      //await connectToDB();
       const latestStamp = await Stamp.findOne({ id }).sort({ lastUpdated: -1 }).exec();
       return latestStamp?.clockIn || null; // Return null if no clockIn time is found
     } catch (error) {
@@ -115,7 +120,7 @@ export async function clockInOut({ id }: Params) {
   }
   export async function updateStamp({id, stamp} : stampFunction){
     try{
-      connectToDB(); 
+      //connectToDB(); 
       const role = await getRole({id});
       if(role !== "Director" && role !== "Owner"){
         throw new Error("Unauthorized Action")
@@ -130,7 +135,7 @@ export async function clockInOut({ id }: Params) {
   }
 
   export async function DeleteStamp({id,stamp} : stampFunction ) : Promise<void>{
-    connectToDB();
+    //connectToDB();
     const role = await getRole({id : id});
     if(role !== "Director" && role !== "Owner"){
       throw new Error("Unauthorized operation")
@@ -146,7 +151,7 @@ export async function clockInOut({ id }: Params) {
   }
 
   export async function CreateStamp({OID,UID,stamp}: creatingStamp)  {
-    connectToDB();
+    //connectToDB();
     const role = await getRole({id : OID});
     if(role !== "Director" && role !== "Owner"){
       throw new Error("Unauthorized operation")
