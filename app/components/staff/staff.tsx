@@ -1,30 +1,45 @@
+"use client"
 import AccountCount from '@/app/components/accounts/AccountCount';
 import UnVerrifiedAccount from '@/app/components/accounts/UnVerrifiedAccount';
 import VerrifiedAccount from '@/app/components/accounts/VerrifiedAccount';
 import { getAllInstructors, getAllInstructorsAndDirectors, getAllUnverifiedInstructors, getRole } from '@/lib/actions/user.actions';
-import { currentUser } from '@clerk/nextjs/server';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Users, UserCheck, Clock } from 'lucide-react';
 import { getAllLocations } from '@/lib/actions/locations.actions';
 import { redirect } from 'next/navigation';
 
-const Staff = async () => {
-  const user = await currentUser();
-  if (!user) return null;
-  const role = await getRole({id : user.id});
-  const isAdmin = role === "Director" || role === "Owner"
-  if(!isAdmin){redirect('/punch')}
+interface params{
+    id : string;
+}
+
+const Staff = ({id} : params) => {
+  const [verifiedStaff, setVerifiedStaff] = React.useState([]);
+  const [locations, setLocations] = React.useState([]);
+  const [unverifiedStaff, setUnverifiedStaff] = React.useState([]);
   
-  let verifiedStaff;  
-  if(role === "Director"){
-    verifiedStaff = await getAllInstructors({ id: user.id });
-  }
-  else{
-    verifiedStaff = await getAllInstructorsAndDirectors({ id: user.id });
-  }
-  await getAllInstructors({ id: user.id });
-  const unverifiedStaff = await getAllUnverifiedInstructors({ id: user.id });
-  const locations = await getAllLocations();
+  useEffect(() => {{
+    const getData = async () => {
+        const role = await getRole({id : id});
+        const isAdmin = role === "Director" || role === "Owner"
+        if(!isAdmin){redirect('/punch')}
+        
+        let verifiedStaff;  
+        if(role === "Director"){
+          const verifiedStaff : any = await getAllInstructors({ id: id });
+          setVerifiedStaff(verifiedStaff);
+        }
+        else{
+          const verifiedStaff : any= await getAllInstructorsAndDirectors({ id: id });
+          setVerifiedStaff(verifiedStaff);
+        }
+        const unverifiedStaff : any = await getAllUnverifiedInstructors({ id: id });
+        setUnverifiedStaff(unverifiedStaff);
+        const locations = await getAllLocations();
+        setLocations(locations);
+    }
+    getData();
+  }}, []); // eslint-disable-line
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -53,7 +68,7 @@ const Staff = async () => {
               uid={item.id}
               role={item.role}
               pay={item.pay}
-              OID={user.id}
+              OID={id}
               locations={locations}
               location={item.location}
             />
@@ -82,7 +97,7 @@ const Staff = async () => {
                 last={item.lastName}
                 img={item.image}
                 uid={item.id}
-                OID={user.id}
+                OID={id}
                 role={item.role}
                 locations={locations}
                 location={item.location}

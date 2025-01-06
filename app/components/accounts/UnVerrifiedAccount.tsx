@@ -13,13 +13,16 @@ interface Params {
   uid: string;
   role: string;
   OID : string;
+  location : string;
+  locations: { id: string; name: string }[];
 }
 
-const UnVerifiedAccount = ({ first, last, img, uid, role, OID }: Params) => {
+const UnVerifiedAccount = ({ first, last, img, uid, role, OID,location,locations }: Params) => {
   const [isSalaryPopupOpen, setIsSalaryPopupOpen] = useState(false);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [salary, setSalary] = useState<number>(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(role);
+  const [selectedLocation, setSelectedLocation] = useState<string>(location);
   const handleAcceptClick = () => {
     setIsSalaryPopupOpen(true);
   };
@@ -32,13 +35,15 @@ const UnVerifiedAccount = ({ first, last, img, uid, role, OID }: Params) => {
   const handleFormSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     const numericSalary = typeof salary === 'string' ? parseFloat(salary) : salary;
-    await verifyUser({OID : OID, IID : uid, sal : numericSalary, role :selectedOption })
+    await verifyUser({OID : OID, IID : uid, sal : numericSalary, role :selectedOption, location : selectedLocation })
     console.log(`Salary for ${first} ${last}: ${salary}`);
     setIsSalaryPopupOpen(false); 
     redirect('/staff');
   };
   
-
+  const handelLocationChange = (option: string) => {
+    setSelectedLocation(option);
+  }
   const handleRadioChange = (option: string) => {
     setSelectedOption(option);
     };
@@ -109,6 +114,9 @@ const UnVerifiedAccount = ({ first, last, img, uid, role, OID }: Params) => {
             handleRadioChange={handleRadioChange}
             handleCloseSalaryPopup={handleCloseSalaryPopup}
             handleFormSubmit={handleFormSubmit}
+            selectedLocation={selectedLocation}
+            handleLocationHange={handelLocationChange}
+            locations={locations}
             />
       )}
 

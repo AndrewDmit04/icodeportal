@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from "@/lib/utils"
 import { addDays, subDays, format, startOfWeek } from "date-fns"
 import { DateRange } from "react-day-picker"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon, MapPin } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Table,
@@ -29,7 +29,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { getUsersAndTimeWorked } from '@/lib/actions/user.actions';
+import { getRole, getUsersAndTimeWorked } from '@/lib/actions/user.actions';
 import ShiftManagementModal from './TimeModal';
 import {Skeleton} from "@/components/ui/skeleton" // Import Skeleton
 import { exportEmployeeReport } from './exportEmployeeReport';
@@ -42,20 +42,24 @@ interface Employee {
   hourlyRate: number;
   overtime: number;
   lastClockIn: string;
+  location : string;
   shifts: { id: string, date: Date, to: Date, from: Date }[]
 }
 
 interface Params {
   id: string;
+  locations : {id : string, name : string}[];
 }
 
-const AdminHoursDashboard = ({ id }: Params) => {
+const AdminHoursDashboard = ({ id, locations }: Params) => {
   const [loading, setIsLoading] = useState(true)
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [timePeriod, setTimePeriod] = useState('this');
   const [searchQuery, setSearchQuery] = useState('');
   const [refresh,setRefresh] = useState(true);
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [role, setRole] = useState<string>("");
   const [date, setDate] = React.useState<DateRange | undefined>(() => {
     const today = new Date();
     const startOfBiWeekly = startOfWeek(today, { weekStartsOn: 1 });
@@ -68,16 +72,19 @@ const AdminHoursDashboard = ({ id }: Params) => {
   useEffect(() => {
     const fetchInfo = async () => {
       if (date && date.from && date.to) {
-        const instructors = await getUsersAndTimeWorked({ id: id, from: date.from, to: date.to })
+        const instructors : any = await getUsersAndTimeWorked({ id: id, from: date.from, to: date.to })
         setEmployees(instructors);
+        const role : any = await getRole({id});
+        setRole(role);
         if(selectedEmployee !== null){
-            const instructor : any = instructors.find((instructor) => instructor.id === selectedEmployee.id);
+            const instructor : any = instructors.find((instructor : any) => instructor.id === selectedEmployee.id);
             setSelectedEmployee(instructor);
             console.log(instructor);
         }
         setIsLoading(false);
       }
     }
+    
     fetchInfo();
   }, [date,refresh])
 
@@ -112,15 +119,17 @@ const AdminHoursDashboard = ({ id }: Params) => {
     setTimePeriod(value);
   };
 
-  const totalHours = employees.reduce((acc, emp) => acc + emp.hoursWorked, 0);
-  let averageHours = totalHours / employees.length;
+
+  const filteredEmployees = employees.filter(emp => 
+    (selectedLocation === 'all' && emp.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
+    (emp.location === selectedLocation && emp.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+  const totalHours = filteredEmployees.reduce((acc, emp) => acc + emp.hoursWorked, 0);
+  let averageHours = totalHours / filteredEmployees.length;
   if (isNaN(averageHours)) {
     averageHours = 0;
   }
-  const filteredEmployees = employees.filter(emp =>
-    emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    emp.role.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -164,14 +173,37 @@ const AdminHoursDashboard = ({ id }: Params) => {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Active Staff</p>
-                {loading ? <Skeleton className="w-20 h-8"/> : <p className="text-2xl font-bold">{ employees.length}</p>}
+                {loading ? <Skeleton className="w-20 h-8"/> : <p className="text-2xl font-bold">{ filteredEmployees.length}</p>}
               </div>
               <Users className="w-8 h-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
+      
+      
+      {role === "Owner" &&(
+        <Card className="w-64">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <MapPin className="w-4 h-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-500">Location Filter</span>
+            </div>
+            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Locations</SelectItem>
+                {locations.map((location) => (
+                  <SelectItem key={location.id} value={location.id}>
+                    {location.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>)}
       </div>
-
       {/* Controls */}
       <div className="flex flex-col md:flex-row gap-4 items-center">
         <Input
@@ -248,6 +280,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
                 <TableHead>Role</TableHead>
                 <TableHead>Hours Worked</TableHead>
                 <TableHead>Last Clock In</TableHead>
+                <TableHead>Location</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -264,6 +297,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
                     <TableCell>{employee.role}</TableCell>
                     <TableCell>{employee.hoursWorked.toFixed(1)}</TableCell>
                     <TableCell>{employee.lastClockIn}</TableCell>
+                    <TableCell>{locations.find((loc) => loc.id === employee.location)?.name}</TableCell>
                   </TableRow>
                 ))
               )}
