@@ -1,17 +1,28 @@
 import AccountCount from '@/app/components/accounts/AccountCount';
 import UnVerrifiedAccount from '@/app/components/accounts/UnVerrifiedAccount';
 import VerrifiedAccount from '@/app/components/accounts/VerrifiedAccount';
-import { getAllInstructors, getAllUnverifiedInstructors } from '@/lib/actions/user.actions';
+import { getAllInstructors, getAllInstructorsAndDirectors, getAllUnverifiedInstructors, getRole } from '@/lib/actions/user.actions';
 import { currentUser } from '@clerk/nextjs/server';
 import React from 'react';
 import { Users, UserCheck, Clock } from 'lucide-react';
 import { getAllLocations } from '@/lib/actions/locations.actions';
+import { redirect } from 'next/navigation';
 
 const Staff = async () => {
   const user = await currentUser();
   if (!user) return null;
-
-  const verifiedStaff = await getAllInstructors({ id: user.id });
+  const role = await getRole({id : user.id});
+  const isAdmin = role === "Director" || role === "Owner"
+  if(!isAdmin){redirect('/punch')}
+  
+  let verifiedStaff;  
+  if(role === "Director"){
+    verifiedStaff = await getAllInstructors({ id: user.id });
+  }
+  else{
+    verifiedStaff = await getAllInstructorsAndDirectors({ id: user.id });
+  }
+  await getAllInstructors({ id: user.id });
   const unverifiedStaff = await getAllUnverifiedInstructors({ id: user.id });
   const locations = await getAllLocations();
 

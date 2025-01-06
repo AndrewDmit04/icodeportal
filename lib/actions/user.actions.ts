@@ -100,6 +100,25 @@ export async function getAllUnverifiedInstructors({id} : Params1) : Promise<type
     throw error;
   }
 }
+export async function getAllInstructorsAndDirectors({id} : Params1) : Promise<typeof User[]>{
+  try{
+    connectToDB();
+    const user: any= await getUser({id});
+    if(user.role !== "Owner"){
+      throw new Error("Unauthorized operation")
+    }
+
+    
+
+    const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: true });
+    return users;
+
+  }
+  catch(error){
+    throw error;
+  }
+}
+
 export async function getAllInstructors({id} : Params1) : Promise<typeof User[]>{
   try{
     connectToDB();
@@ -108,13 +127,13 @@ export async function getAllInstructors({id} : Params1) : Promise<typeof User[]>
       throw new Error("Unauthorized operation")
     }
     if(user.role === "Director"){
-      const users = await User.find({ role: { $in: ["Instructor"] }, location : (user as any).location, verified: true });
+      const users = await User.find({ role: { $in: ["Instructor"] }, location : user.location, verified: true });
       
       return users;
     }
     
     if(user.role === "Owner"){
-      const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: true });
+      const users = await User.find({ role: { $in: ["Instructor"] }, verified: true });
       return users;
     }
     return [];

@@ -90,9 +90,10 @@ const VerifiedAccount = ({ first, last, img, uid, role, pay, OID, location, loca
           <p className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
             {role}
           </p>
-          <p className="text-base font-semibold text-green-600">
-            ${pay.toFixed(2)}/hr
-          </p>
+          { role === "Instructor" ? 
+          (<p className="text-base font-semibold text-green-600">
+             ${pay.toFixed(2)}/hr
+          </p>) : <></>}
           <p>Location: {locations.find(loc => loc.id === location)?.name}</p>
         </div>
 
