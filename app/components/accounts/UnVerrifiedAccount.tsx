@@ -15,9 +15,10 @@ interface Params {
   OID : string;
   location : string;
   locations: { id: string; name: string }[];
+  setRefresh : any;
 }
 
-const UnVerifiedAccount = ({ first, last, img, uid, role, OID,location,locations }: Params) => {
+const UnVerifiedAccount = ({ first, last, img, uid, role, OID,location,locations, setRefresh }: Params) => {
   const [isSalaryPopupOpen, setIsSalaryPopupOpen] = useState(false);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [salary, setSalary] = useState<number>(0);
@@ -37,8 +38,9 @@ const UnVerifiedAccount = ({ first, last, img, uid, role, OID,location,locations
     const numericSalary = typeof salary === 'string' ? parseFloat(salary) : salary;
     await verifyUser({OID : OID, IID : uid, sal : numericSalary, role :selectedOption, location : selectedLocation })
     console.log(`Salary for ${first} ${last}: ${salary}`);
+    setRefresh((prev : any) => !prev)
     setIsSalaryPopupOpen(false); 
-    redirect('/staff');
+    
   };
   
   const handelLocationChange = (option: string) => {
