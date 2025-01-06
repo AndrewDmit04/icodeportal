@@ -1,20 +1,26 @@
 "use server"
 
 import Stamp from "../models/stamp.models"
-import { connectToDB } from "../mongoose"
+import  connectToDB  from "../mongoose"
 import { getRole } from "./user.actions";
 
 interface Params{
     id : string,
 }
-let connected = false;
-if(!connected){
-  connectToDB();
-  connected = true;
-  console.log("Connection For Stamps");
-}
+let connectionPromise: Promise<typeof import("mongoose")> | null = null;
+
+// Ensure single connection
+const ensureConnection = async () => {
+  if (!connectionPromise) {
+    connectionPromise = connectToDB();
+    await connectionPromise;
+    console.log("Database connection established");
+  }
+  return connectionPromise;
+};
 export async function isClockedIn({id} : Params) : Promise<boolean>{
     //await connectToDB();
+    await ensureConnection();
     try {
       const latestStamp = await Stamp.findOne({id}).sort({ lastUpdated: -1 }).exec();
       if (latestStamp === null){
@@ -31,6 +37,7 @@ export async function isClockedIn({id} : Params) : Promise<boolean>{
 export async function clockInOut({ id }: Params) {
     try {
       //await connectToDB();
+      await ensureConnection();
       const currentDate = new Date();
       
       if (!(await isClockedIn({ id }))) {
@@ -62,6 +69,7 @@ export async function clockInOut({ id }: Params) {
   
   export const getTodaysShifts = async ({ id }: Params) => {
     try {
+      await ensureConnection();
       const today = new Date();
       const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Start of today
       const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // End of today
@@ -100,6 +108,7 @@ export async function clockInOut({ id }: Params) {
   export async function getClockInTime({ id }: Params) {
     try {
       //await connectToDB();
+      await ensureConnection();
       const latestStamp = await Stamp.findOne({ id }).sort({ lastUpdated: -1 }).exec();
       return latestStamp?.clockIn || null; // Return null if no clockIn time is found
     } catch (error) {
@@ -121,6 +130,7 @@ export async function clockInOut({ id }: Params) {
   export async function updateStamp({id, stamp} : stampFunction){
     try{
       //connectToDB(); 
+      await ensureConnection();
       const role = await getRole({id});
       if(role !== "Director" && role !== "Owner"){
         throw new Error("Unauthorized Action")
@@ -136,6 +146,7 @@ export async function clockInOut({ id }: Params) {
 
   export async function DeleteStamp({id,stamp} : stampFunction ) : Promise<void>{
     //connectToDB();
+    await ensureConnection();
     const role = await getRole({id : id});
     if(role !== "Director" && role !== "Owner"){
       throw new Error("Unauthorized operation")
@@ -152,6 +163,7 @@ export async function clockInOut({ id }: Params) {
 
   export async function CreateStamp({OID,UID,stamp}: creatingStamp)  {
     //connectToDB();
+    await ensureConnection();
     const role = await getRole({id : OID});
     if(role !== "Director" && role !== "Owner"){
       throw new Error("Unauthorized operation")
@@ -177,6 +189,7 @@ export async function clockInOut({ id }: Params) {
 
   export async function getUserStamps({UID, id, from, to} : getUserStamps){
     try{
+      await ensureConnection();
       if(UID != id){
         throw Error("Unauthorized Action");
       }

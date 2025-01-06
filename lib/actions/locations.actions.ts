@@ -1,22 +1,28 @@
 "use server"
 import Location from "../models/location.models";
-import { connectToDB } from "../mongoose";
+import connectToDB  from "../mongoose";
 import { getRole } from "./user.actions";
 
 interface ParamsLoc {
     id : string;
 
 }
-let connected = false;
-if(!connected){
-  connectToDB();
-  connected = true;
-  console.log("connection estanblished for locations");
-}
+let connectionPromise: Promise<typeof import("mongoose")> | null = null;
+
+// Ensure single connection
+const ensureConnection = async () => {
+  if (!connectionPromise) {
+    connectionPromise = connectToDB();
+    await connectionPromise;
+    console.log("Database connection established");
+  }
+  return connectionPromise;
+};
+
 export async function getAllLocations() : Promise<any> {
     try{
         //connectToDB();
-
+        await ensureConnection();
         const locations = await Location.find({}).lean();
         const plainLocations = locations.map((location : any) => ({
           ...location,
@@ -41,6 +47,7 @@ export async function createOrFindLocation({id, name, address } : Params) : Prom
     try {
       // Find and update the user if exists, or create a new one if not
       //connectToDB();
+      await ensureConnection();
       const role  = await getRole({id});
       if(role != "Owner"){
         throw new Error("You are not authorized to create a location");
@@ -60,6 +67,7 @@ export async function deleteLocation({id, locationId} : {id : string, locationId
     try {
       // Find and update the user if exists, or create a new one if not
       //connectToDB();
+      await ensureConnection();
       const role  = await getRole({id});
       if(role != "Owner"){
         throw new Error("You are not authorized to create a location");

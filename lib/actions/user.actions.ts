@@ -2,7 +2,7 @@
 
 import Stamp from "../models/stamp.models";
 import User from "../models/user.models"
-import { connectToDB } from "../mongoose"
+import  connectToDB  from "../mongoose"
 import { format } from 'date-fns';
 
 
@@ -15,19 +15,25 @@ interface Params {
   image : string;
   location : string;
 }
-let connected = false;
-if(!connected){
-  connectToDB();
-  connected = true;
-  console.log("Connection estanblished for userss");
-}
 
+// Initialize connection once at the module level
+let connectionPromise: Promise<typeof import("mongoose")> | null = null;
+
+// Ensure single connection
+const ensureConnection = async () => {
+  if (!connectionPromise) {
+    connectionPromise = connectToDB();
+    await connectionPromise;
+    console.log("Database connection established");
+  }
+  return connectionPromise;
+};
 
 export async function createOrFindUser({ id, firstName, lastName, role, image, location } : Params) : Promise<void> {
   try {
     // Find and update the user if exists, or create a new one if not
     //connectToDB();
-    
+    await ensureConnection();
     await User.findOneAndUpdate(
       {id}, // Find by userId
       { firstName, lastName, role,image, onboarded : true,location }, // Fields to update
@@ -47,6 +53,7 @@ interface Params1{
 export async function getUser({id} : Params1) : Promise<typeof User>{
   try{
     //connectToDB();
+    await ensureConnection();
     const user = await User.findOne({"id" : id});
     return user;
   }
@@ -59,6 +66,7 @@ export async function getUser({id} : Params1) : Promise<typeof User>{
 export async function isVerrified({id} : Params1) : Promise<boolean>{
   try{
     //connectToDB();
+    await ensureConnection();
     const user = await User.findOne({"id" : id});
     if(!user) return false;
     return user.verified;
@@ -72,6 +80,7 @@ export async function isVerrified({id} : Params1) : Promise<boolean>{
 export async function getRole({id} : Params1) : Promise<String>{
   try{
     //connectToDB();
+    await ensureConnection();
     const user = await User.findOne({"id" : id});
     if(!user) return "Unauthorized";
     return user.role;
@@ -85,6 +94,7 @@ export async function getRole({id} : Params1) : Promise<String>{
 export async function getAllUnverifiedInstructors({id} : Params1) : Promise<typeof User[]>{
   try{
     //connectToDB();
+    await ensureConnection();
     const user : any  = await getUser({id});
 
     if(user.role !== "Director" && user.role !== "Owner"){
@@ -117,6 +127,7 @@ export async function getAllUnverifiedInstructors({id} : Params1) : Promise<type
 export async function getAllInstructorsAndDirectors({id} : Params1) : Promise<typeof User[]>{
   try{
     //connectToDB();
+    await ensureConnection();
     const user: any= await getUser({id});
     if(user.role !== "Owner"){
       throw new Error("Unauthorized operation")
@@ -140,6 +151,7 @@ export async function getAllInstructorsAndDirectors({id} : Params1) : Promise<ty
 export async function getAllInstructors({id} : Params1) : Promise<typeof User[]>{
   try{
     //connectToDB();
+    await ensureConnection();
     const user: any= await getUser({id});
     if(user.role !== "Director" && user.role !== "Owner"){
       throw new Error("Unauthorized operation")
@@ -172,6 +184,7 @@ interface Params2{
 
 export async function verifyUser({OID,IID,sal,role, location} : Params2) : Promise<void>{
   //connectToDB();
+  await ensureConnection();
   const Orole = await getRole({id : OID});
   if(Orole !== "Director" && Orole !== "Owner"){
     throw new Error("Unauthorized operation")
@@ -195,6 +208,7 @@ interface Params3{
 
 export async function DeleteUser({OID,IID} : Params3) : Promise<void>{
  // connectToDB();
+ await ensureConnection();
   const Orole = await getRole({id : OID});
   if(Orole !== "Director" && Orole !== "Owner"){
     throw new Error("Unauthorized operation")
@@ -215,7 +229,7 @@ interface Employee {
 export async function getAllInstructorsAndTimeStatus({ id }: { id: string }): Promise<Employee[]> {
   try {
     //await connectToDB();
-
+    await ensureConnection();
     // Verify the role
     const role = await getRole({ id });
     if (role !== "Director" && role !== "Owner") {
@@ -272,6 +286,7 @@ interface EmployeeTimes {
 
 export async function getUsersAndTimeWorked({id,from,to} : UserDates) : Promise<EmployeeTimes[]>{
     try{
+      await ensureConnection();
       const instructors = await getAllInstructors({id});
       let timestamps = await Stamp.find({
         lastUpdated: { $gte: from, $lte: to },
