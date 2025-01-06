@@ -85,14 +85,21 @@ export async function getAllUnverifiedInstructors({id} : Params1) : Promise<type
     }
     
     if(user.role === "Director"){
-      const users = await User.find({ role: { $in: ["Instructor", "Director"] }, location : (user as any).location, verified: false });
-      
-      return users;
+      const users = await User.find({ role: { $in: ["Instructor", "Director"] }, location : (user as any).location, verified: false }).lean();
+      const fileterdUsers = users.map((user) => {
+        const { _id, ...rest } = user;
+        return { _id: null, ...rest };
+      });
+      return fileterdUsers as any;;
     }
     
     if(user.role === "Owner"){
-      const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: false });
-      return users;
+      const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: false }).lean();
+      const fileterdUsers = users.map((user) => {
+        const { _id, ...rest } = user;
+        return { _id: null, ...rest };
+      });
+      return fileterdUsers as any;
     }
     return [];
   }
@@ -110,8 +117,12 @@ export async function getAllInstructorsAndDirectors({id} : Params1) : Promise<ty
 
     
 
-    const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: true });
-    return users;
+    const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: true }).lean();
+    const fileterdUsers = users.map((user) => {
+      const { _id, ...rest } = user;
+      return { _id: null, ...rest };
+    });
+    return fileterdUsers as any;
 
   }
   catch(error){
@@ -178,7 +189,7 @@ interface Params3{
 export async function DeleteUser({OID,IID} : Params3) : Promise<void>{
   connectToDB();
   const Orole = await getRole({id : OID});
-  if(Orole !== "Director"){
+  if(Orole !== "Director" && Orole !== "Owner"){
     throw new Error("Unauthorized operation")
   }
   await User.deleteOne(

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from "@/lib/utils"
 import { addDays, subDays, format, startOfWeek } from "date-fns"
 import { DateRange } from "react-day-picker"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon, MapPin } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Table,
@@ -29,7 +29,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { getUsersAndTimeWorked } from '@/lib/actions/user.actions';
+import { getRole, getUsersAndTimeWorked } from '@/lib/actions/user.actions';
 import ShiftManagementModal from './TimeModal';
 import {Skeleton} from "@/components/ui/skeleton" // Import Skeleton
 import { exportEmployeeReport } from './exportEmployeeReport';
@@ -57,7 +57,9 @@ const AdminHoursDashboard = ({ id, locations }: Params) => {
   const [timePeriod, setTimePeriod] = useState('this');
   const [searchQuery, setSearchQuery] = useState('');
   const [refresh,setRefresh] = useState(true);
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [role, setRole] = useState<string>("");
   const [date, setDate] = React.useState<DateRange | undefined>(() => {
     const today = new Date();
     const startOfBiWeekly = startOfWeek(today, { weekStartsOn: 1 });
@@ -72,6 +74,8 @@ const AdminHoursDashboard = ({ id, locations }: Params) => {
       if (date && date.from && date.to) {
         const instructors : any = await getUsersAndTimeWorked({ id: id, from: date.from, to: date.to })
         setEmployees(instructors);
+        const role : any = await getRole({id});
+        setRole(role);
         if(selectedEmployee !== null){
             const instructor : any = instructors.find((instructor : any) => instructor.id === selectedEmployee.id);
             setSelectedEmployee(instructor);
@@ -80,6 +84,7 @@ const AdminHoursDashboard = ({ id, locations }: Params) => {
         setIsLoading(false);
       }
     }
+    
     fetchInfo();
   }, [date,refresh])
 
@@ -114,15 +119,17 @@ const AdminHoursDashboard = ({ id, locations }: Params) => {
     setTimePeriod(value);
   };
 
-  const totalHours = employees.reduce((acc, emp) => acc + emp.hoursWorked, 0);
-  let averageHours = totalHours / employees.length;
+
+  const filteredEmployees = employees.filter(emp => 
+    (selectedLocation === 'all' && emp.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
+    (emp.location === selectedLocation && emp.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+  const totalHours = filteredEmployees.reduce((acc, emp) => acc + emp.hoursWorked, 0);
+  let averageHours = totalHours / filteredEmployees.length;
   if (isNaN(averageHours)) {
     averageHours = 0;
   }
-  const filteredEmployees = employees.filter(emp =>
-    emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    emp.role.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -166,14 +173,37 @@ const AdminHoursDashboard = ({ id, locations }: Params) => {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Active Staff</p>
-                {loading ? <Skeleton className="w-20 h-8"/> : <p className="text-2xl font-bold">{ employees.length}</p>}
+                {loading ? <Skeleton className="w-20 h-8"/> : <p className="text-2xl font-bold">{ filteredEmployees.length}</p>}
               </div>
               <Users className="w-8 h-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
+      
+      
+      {role === "Owner" &&(
+        <Card className="w-64">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <MapPin className="w-4 h-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-500">Location Filter</span>
+            </div>
+            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Locations</SelectItem>
+                {locations.map((location) => (
+                  <SelectItem key={location.id} value={location.id}>
+                    {location.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>)}
       </div>
-
       {/* Controls */}
       <div className="flex flex-col md:flex-row gap-4 items-center">
         <Input

@@ -117,7 +117,7 @@ export async function clockInOut({ id }: Params) {
     try{
       connectToDB(); 
       const role = await getRole({id});
-      if(role !== "Director"){
+      if(role !== "Director" && role !== "Owner"){
         throw new Error("Unauthorized Action")
       }
       await Stamp.findOneAndUpdate(
@@ -132,7 +132,7 @@ export async function clockInOut({ id }: Params) {
   export async function DeleteStamp({id,stamp} : stampFunction ) : Promise<void>{
     connectToDB();
     const role = await getRole({id : id});
-    if(role !== "Director"){
+    if(role !== "Director" && role !== "Owner"){
       throw new Error("Unauthorized operation")
     }
     await Stamp.deleteOne(
@@ -148,7 +148,7 @@ export async function clockInOut({ id }: Params) {
   export async function CreateStamp({OID,UID,stamp}: creatingStamp)  {
     connectToDB();
     const role = await getRole({id : OID});
-    if(role !== "Director"){
+    if(role !== "Director" && role !== "Owner"){
       throw new Error("Unauthorized operation")
     }
     const newStamp = new Stamp({
