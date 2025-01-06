@@ -17,9 +17,10 @@ interface Params {
   OID : string;
   location: string;
   locations: { id: string; name: string }[];
+  setRefresh : any;
 }
 
-const VerifiedAccount = ({ first, last, img, uid, role, pay, OID, location, locations }: Params) => {
+const VerifiedAccount = ({ first, last, img, uid, role, pay, OID, location, locations,setRefresh }: Params) => {
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [salary, setSalary] = useState<number>(pay);
@@ -40,7 +41,7 @@ const VerifiedAccount = ({ first, last, img, uid, role, pay, OID, location, loca
     const numericSalary = typeof salary === 'string' ? parseFloat(salary) : salary;
     await verifyUser({OID : OID, IID : uid, sal : numericSalary, role :selectedOption, location : selectedLocation })
     setIsEditPopupOpen(false); 
-    redirect('/staff');
+    setRefresh((prev: any) => !prev)
   };
   
 
