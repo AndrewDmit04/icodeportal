@@ -65,7 +65,7 @@ const VerifiedAccount = ({ first, last, img, uid, role, pay, OID, location, loca
     console.log(`User ${first} ${last} has been deleted.`);
     DeleteUser({OID : OID, IID : uid})
     setIsDeletePopupOpen(false); 
-    redirect('/staff');
+    setRefresh((prev : any) => !prev)
   };
 
   return (
