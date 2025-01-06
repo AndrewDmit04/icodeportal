@@ -53,7 +53,7 @@ const LocationsPage = ({ id }: LocationParams) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const locations = await getAllLocations({ id });
+        const locations = await getAllLocations();
         setLocations(locations);
         console.log(locations);
         setLoading(false);
