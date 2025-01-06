@@ -14,14 +14,17 @@ interface Params {
   uid: string;
   role: string;
   pay: number;
-  OID : string
+  OID : string;
+  location: string;
+  locations: { id: string; name: string }[];
 }
 
-const VerifiedAccount = ({ first, last, img, uid, role, pay, OID }: Params) => {
+const VerifiedAccount = ({ first, last, img, uid, role, pay, OID, location, locations }: Params) => {
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [salary, setSalary] = useState<number>(pay);
   const [selectedOption, setSelectedOption] = useState<string | null>(role);
+  const [selectedLocation, setSelectedLocation] = useState<string>(location);
 
   const handleEditClick = () => {
     setIsEditPopupOpen(true);
@@ -35,8 +38,7 @@ const VerifiedAccount = ({ first, last, img, uid, role, pay, OID }: Params) => {
   const handleFormSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     const numericSalary = typeof salary === 'string' ? parseFloat(salary) : salary;
-    await verifyUser({OID : OID, IID : uid, sal : numericSalary, role :selectedOption })
-    console.log(`Salary for ${first} ${last}: ${salary}`);
+    await verifyUser({OID : OID, IID : uid, sal : numericSalary, role :selectedOption, location : selectedLocation })
     setIsEditPopupOpen(false); 
     redirect('/staff');
   };
@@ -45,6 +47,10 @@ const VerifiedAccount = ({ first, last, img, uid, role, pay, OID }: Params) => {
   const handleRadioChange = (option: string) => {
     setSelectedOption(option);
     };
+
+  const handelLocationChange = (option: string) => {
+    setSelectedLocation(option);
+  }
 
   const handleDenyClick = () => {
     setIsDeletePopupOpen(true);
@@ -87,6 +93,7 @@ const VerifiedAccount = ({ first, last, img, uid, role, pay, OID }: Params) => {
           <p className="text-base font-semibold text-green-600">
             ${pay.toFixed(2)}/hr
           </p>
+          <p>Location: {locations.find(loc => loc.id === location)?.name}</p>
         </div>
 
         <div className="flex gap-2 w-full pt-2">
@@ -121,6 +128,9 @@ const VerifiedAccount = ({ first, last, img, uid, role, pay, OID }: Params) => {
                 handleRadioChange={handleRadioChange}
                 handleCloseSalaryPopup={handleCloseSalaryPopup}
                 handleFormSubmit={handleFormSubmit}
+                selectedLocation={selectedLocation}
+                handleLocationHange={handelLocationChange}
+                locations={locations}
                 />
       )}
 

@@ -6,18 +6,20 @@ import { redirect } from 'next/navigation'
 import { SignOutButton, UserButton } from '@clerk/nextjs'
 import { currentUser } from '@clerk/nextjs/server'
 import { isVerrified } from '@/lib/actions/user.actions'
+import { getAllLocations } from '@/lib/actions/locations.actions'
 const page = async () => {
   const user = await currentUser();
   if(!user){redirect('/sign-in')}
 
 
-
+  const locations = await getAllLocations();
   const ver = await isVerrified({id : user.id})
   if(ver){redirect('/')}
   
   const userData = {
     id : user.id,
-    image : user.imageUrl
+    image : user.imageUrl,
+    locations : locations
   }
 
   return (

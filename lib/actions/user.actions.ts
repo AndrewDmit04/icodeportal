@@ -6,22 +6,24 @@ import { connectToDB } from "../mongoose"
 import { format } from 'date-fns';
 
 
+
 interface Params {
   id : string;
   firstName: string;
   lastName: string;
   role: string;
   image : string;
+  location : string;
 }
 
-export async function createOrFindUser({ id, firstName, lastName, role, image } : Params) : Promise<void> {
+export async function createOrFindUser({ id, firstName, lastName, role, image, location } : Params) : Promise<void> {
   try {
     // Find and update the user if exists, or create a new one if not
     connectToDB();
     
     await User.findOneAndUpdate(
       {id}, // Find by userId
-      { firstName, lastName, role,image, onboarded : true }, // Fields to update
+      { firstName, lastName, role,image, onboarded : true,location }, // Fields to update
       { new: true, upsert: true, setDefaultsOnInsert: true } // Options: new document if not found
     );
 
@@ -76,12 +78,23 @@ export async function getRole({id} : Params1) : Promise<String>{
 export async function getAllUnverifiedInstructors({id} : Params1) : Promise<typeof User[]>{
   try{
     connectToDB();
-    const role = await getRole({id});
-    if(role !== "Director"){
+    const user : any  = await getUser({id});
+
+    if(user.role !== "Director" && user.role !== "Owner"){
       throw new Error("Unauthorized operation")
     }
-    const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: false });
-    return users;
+    
+    if(user.role === "Director"){
+      const users = await User.find({ role: { $in: ["Instructor", "Director"] }, location : (user as any).location, verified: false });
+      
+      return users;
+    }
+    
+    if(user.role === "Owner"){
+      const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: false });
+      return users;
+    }
+    return [];
   }
   catch(error){
     throw error;
@@ -90,12 +103,21 @@ export async function getAllUnverifiedInstructors({id} : Params1) : Promise<type
 export async function getAllInstructors({id} : Params1) : Promise<typeof User[]>{
   try{
     connectToDB();
-    const role = await getRole({id});
-    if(role !== "Director"){
+    const user: any= await getUser({id});
+    if(user.role !== "Director" && user.role !== "Owner"){
       throw new Error("Unauthorized operation")
     }
-    const users = await User.find({role : "Instructor", verified : true});
-    return users;
+    if(user.role === "Director"){
+      const users = await User.find({ role: { $in: ["Instructor"] }, location : (user as any).location, verified: true });
+      
+      return users;
+    }
+    
+    if(user.role === "Owner"){
+      const users = await User.find({ role: { $in: ["Instructor", "Director"] }, verified: true });
+      return users;
+    }
+    return [];
   }
   catch(error){
     throw error;
@@ -106,14 +128,15 @@ interface Params2{
   OID : string,
   IID : string,
   sal : number,
-  role : string | null
+  role : string | null,
+  location : string;
 }
 
 
-export async function verifyUser({OID,IID,sal,role} : Params2) : Promise<void>{
+export async function verifyUser({OID,IID,sal,role, location} : Params2) : Promise<void>{
   connectToDB();
   const Orole = await getRole({id : OID});
-  if(Orole !== "Director"){
+  if(Orole !== "Director" && Orole !== "Owner"){
     throw new Error("Unauthorized operation")
   }
   if(role === "Unverify"){
@@ -125,7 +148,7 @@ export async function verifyUser({OID,IID,sal,role} : Params2) : Promise<void>{
   }
   await User.findOneAndUpdate(
     {id : IID}, // Find by userId
-    { verified : true, pay : sal, role : role }, // Fields to update
+    { verified : true, pay : sal, role : role, location }, // Fields to update
   );
 }
 interface Params3{
@@ -158,17 +181,16 @@ export async function getAllInstructorsAndTimeStatus({ id }: { id: string }): Pr
 
     // Verify the role
     const role = await getRole({ id });
-    if (role !== "Director") {
+    if (role !== "Director" && role !== "Owner") {
       throw new Error("Unauthorized operation");
     }
 
     // Fetch all instructors
-    const users = await User.find({ role: "Instructor", verified: true });
-    
+    const users : any = await getAllInstructors({id});
     // Fetch all timestamps with no clock-out time
     const timeLogs = await Stamp.find({ clockOut: null });
     // Map users to the desired format
-    const employees: Employee[] = users.map(user => {
+    const employees: Employee[] = users.map((user : any) => {
       const matchingLog = timeLogs.find(log => log.id === user.id);
       
       return {
@@ -176,7 +198,8 @@ export async function getAllInstructorsAndTimeStatus({ id }: { id: string }): Pr
         name: `${user.firstName} ${user.lastName}`,
         status: matchingLog ? 'clocked-in' : 'clocked-out',
         img : user.image,
-        clockedIn : matchingLog ? matchingLog.clockIn : null
+        clockedIn : matchingLog ? matchingLog.clockIn : null,
+        location : user.location
       };
     });
 
@@ -258,6 +281,7 @@ export async function getUsersAndTimeWorked({id,from,to} : UserDates) : Promise<
           overtime,
           lastClockIn,
           shifts,
+          location : instructor.location
         };
       });
       return (employees);

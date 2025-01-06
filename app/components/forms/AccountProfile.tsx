@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import formSchema from "@/lib/validations/user"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -14,37 +13,55 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { createOrFindUser } from "@/lib/actions/user.actions"
 import { redirect } from "next/navigation"
-interface Props{
-    user : {id : string, image : string}
+
+// Update the form schema to include location
+const formSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  role: z.enum(["Instructor", "Director"]),
+  location: z.string().min(1, "Please select a location")
+});
+
+interface Props {
+  user: { id: string; image: string, locations: { id: string; name: string }[]}
 }
 
+export default function ProfileForm({ user }: Props) {
+  // Sample locations - replace with your actual locations data
+  const locations = user.locations
 
-
-export default function ProfileForm({user} : Props) {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: "",
-      lastName : "",
-      role : "Instructor"
+      lastName: "",
+      role: "Instructor",
+      location: ""
     },
-  })
- 
-  // 2. Define a submit handler.
+  });
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values.location);
     await createOrFindUser({
-        firstName : values.firstName,
-        lastName: values.lastName,
-        role : values.role,
-        id : user.id,
-        image : user.image
+      firstName: values.firstName,
+      lastName: values.lastName,
+      role: values.role,
+      location: values.location,
+      id: user.id,
+      image: user.image
     });
-    redirect('/')
+    redirect('/');
   }
 
   return (
@@ -66,6 +83,7 @@ export default function ProfileForm({user} : Props) {
             </FormItem>
           )}
         />
+        
         <FormField
           control={form.control}
           name="lastName"
@@ -77,6 +95,34 @@ export default function ProfileForm({user} : Props) {
               </FormControl>
               <FormDescription>
                 Type in your last name here
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a location" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {locations.map((location) => (
+                    <SelectItem key={location.id} value={location.id}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Select your primary work location
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -121,5 +167,5 @@ export default function ProfileForm({user} : Props) {
         <Button type="submit">Submit</Button>
       </form>
     </Form>
-  )
+  );
 }

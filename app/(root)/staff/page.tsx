@@ -5,13 +5,15 @@ import { getAllInstructors, getAllUnverifiedInstructors } from '@/lib/actions/us
 import { currentUser } from '@clerk/nextjs/server';
 import React from 'react';
 import { Users, UserCheck, Clock } from 'lucide-react';
+import { getAllLocations } from '@/lib/actions/locations.actions';
 
 const Staff = async () => {
   const user = await currentUser();
   if (!user) return null;
+
   const verifiedStaff = await getAllInstructors({ id: user.id });
   const unverifiedStaff = await getAllUnverifiedInstructors({ id: user.id });
-
+  const locations = await getAllLocations();
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -41,6 +43,8 @@ const Staff = async () => {
               role={item.role}
               pay={item.pay}
               OID={user.id}
+              locations={locations}
+              location={item.location}
             />
           ))}
         </div>
@@ -69,6 +73,8 @@ const Staff = async () => {
                 uid={item.id}
                 OID={user.id}
                 role={item.role}
+                locations={locations}
+                location={item.location}
               />
             ))}
           </div>

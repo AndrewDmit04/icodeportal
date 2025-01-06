@@ -1,75 +1,119 @@
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import React, { FormEventHandler, MouseEventHandler } from 'react'
 
-interface Params{
-    first : string;
-    salary : number;
-    setSalary : Function;
-    selectedOption : string | null;
-    handleRadioChange : Function;
-    handleCloseSalaryPopup : MouseEventHandler;
-    handleFormSubmit : FormEventHandler;
+interface Params {
+  first: string;
+  salary: number;
+  setSalary: Function;
+  selectedOption: string | null;
+  handleRadioChange: Function;
+  handleCloseSalaryPopup: MouseEventHandler;
+  handleFormSubmit: FormEventHandler;
+  selectedLocation: string | null;
+  locations: { id: string; name: string }[];
+  handleLocationHange: Function;
 }
 
-
-const VerifiedAccountForm = ({first, handleFormSubmit, salary, setSalary,selectedOption,handleRadioChange,handleCloseSalaryPopup} : Params) => {
+const VerifiedAccountForm = ({
+  first,
+  handleFormSubmit,
+  salary,
+  setSalary,
+  selectedOption,
+  handleRadioChange,
+  handleCloseSalaryPopup,
+  selectedLocation,
+  locations,
+  handleLocationHange
+}: Params) => {
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-md shadow-lg w-90">
-      <h2 className="text-xl font-semibold">Verification</h2>
-      <p className="text-red-400 text-sm mb-4">WARNING, {first} will have acesses to the portal</p>
-      <p>Salary</p>
-      <form onSubmit={handleFormSubmit}>
-        <input
-          type="number"
-          placeholder="Enter salary"
-          className="w-full p-2 border border-gray-300 rounded mb-4"
-          value={salary}
-          onChange={(e) => setSalary(e.target.value)}
-          required
-        />
-      
-      <div className="mb-4">
-          <p className="font-semibold mb-2">Role</p>
-          <label className="flex items-center gap-2">
-          <input
-              type="radio"
-              name="role"
-              value="Instructor"
-              checked={selectedOption === 'Instructor'}
-              onChange={() => handleRadioChange('Instructor')}
-          />
-          Instructor
-          </label>
-          <label className="flex items-center gap-2">
-          <input
-              type="radio"
-              name="role"
-              value="Director"
-              checked={selectedOption === 'Director'}
-              onChange={() => handleRadioChange('Director')}
-          />
-          Director
-          </label>
-          <label className="flex items-center gap-2">
-          <input
-              type="radio"
-              name="role"
-              value="Unverify"
-              checked={selectedOption === 'Unverify'}
-              onChange={() => handleRadioChange('Unverify')}
-          />
-          Unverify
-          </label>
-      </div>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <Card className="w-[400px] max-w-[90vw]">
+        <CardHeader>
+          <CardTitle>Verification</CardTitle>
+          <p className="text-red-400 text-sm">
+            WARNING, {first} will have access to the portal
+          </p>
+        </CardHeader>
 
-        <div className="flex justify-end gap-2">
-          <Button type="button" className="bg-gray-500 hover:bg-gray-700" onClick={handleCloseSalaryPopup}>Cancel</Button>
-          <Button type="submit" className="bg-blue-500 hover:bg-blue-700">Submit</Button>
-        </div>
-      </form>
+        <form onSubmit={handleFormSubmit}>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="salary">Salary</Label>
+              <Input
+                id="salary"
+                type="number"
+                placeholder="Enter salary"
+                value={salary}
+                onChange={(e) => setSalary(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Role</Label>
+              <RadioGroup
+                value={selectedOption || ""}
+                onValueChange={(value) => handleRadioChange(value)}
+                className="flex flex-col space-y-1"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Instructor" id="instructor" />
+                  <Label htmlFor="instructor" className="font-normal">
+                    Instructor
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Director" id="director" />
+                  <Label htmlFor="director" className="font-normal">
+                    Director
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Unverify" id="unverify" />
+                  <Label htmlFor="unverify" className="font-normal">
+                    Unverify
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Location</Label>
+              <RadioGroup
+                value={selectedLocation || ""}
+                onValueChange={(value) => handleLocationHange(value)}
+                className="flex flex-col space-y-1"
+              >
+                {locations.map((location) => (
+                  <div key={location.id} className="flex items-center space-x-2">
+                    <RadioGroupItem value={location.id} id={location.id} />
+                    <Label htmlFor={location.id} className="font-normal">
+                      {location.name}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+          </CardContent>
+
+          <CardFooter className="flex justify-end space-x-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleCloseSalaryPopup}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Submit</Button>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
-  </div>
   )
 }
 

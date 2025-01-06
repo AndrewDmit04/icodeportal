@@ -7,6 +7,8 @@ import { Clock, UserCheck, UserX, History } from 'lucide-react';
 import { getAllInstructorsAndTimeStatus } from '@/lib/actions/user.actions';
 import { clockInOut } from '@/lib/actions/stamp.actions';
 import {Skeleton} from "@/components/ui/skeleton" // Import your Skeleton component
+import Image from 'next/image';
+import { getAllLocations } from '@/lib/actions/locations.actions';
 
 interface Employee {
   id: string;
@@ -14,16 +16,22 @@ interface Employee {
   name: string;
   status: 'clocked-in' | 'clocked-out';
   clockedIn : Date | null;
+  location: string;
 }
 interface Params {
   id: string;
+
+}
+interface Params1 {
+  id: string;
+  locations : {id : string, name : string}[]
 }
 
-const AdminPunch = ({ id }: Params) => {
+const AdminPunch = ({ id,locations }: Params1) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true); // Loading state
-
+  
   const clockInorOut = async ({ id }: Params) => {
     await clockInOut({ id: id });
   };
@@ -34,8 +42,9 @@ const AdminPunch = ({ id }: Params) => {
   useEffect(() => {
     const populate = async () => {
       try {
-        const instructors = await getAllInstructorsAndTimeStatus({ id });
+        const instructors : any = await getAllInstructorsAndTimeStatus({ id });
         setEmployees(instructors);
+        
       } catch (error) {
         console.error("Error fetching instructors:", error);
       } finally {
@@ -184,10 +193,18 @@ const AdminPunch = ({ id }: Params) => {
                         employee.status === 'clocked-in' ? 'bg-green-500' : 'bg-red-500'
                       }`}
                     />
-                    <img src={employee.img} className="w-24 h-24 sm:block hidden rounded-full " />
+                    <Image
+                      className="relative rounded-full border-2 border-white shadow-md"
+                      src={employee.img}
+                      alt={`employee.name`}
+                      width={80}
+                      height={80}
+                      priority
+                    />
                     <div>
                       <h4 className="font-medium">{employee.name}</h4>
                       <p className="text-sm text-gray-500">Instructor</p>
+                      <p className='text-sm text-gray-500'>location: {locations.find((item) => item.id === employee.location)?.name}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">

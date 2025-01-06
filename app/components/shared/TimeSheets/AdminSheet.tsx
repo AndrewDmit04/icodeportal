@@ -42,14 +42,16 @@ interface Employee {
   hourlyRate: number;
   overtime: number;
   lastClockIn: string;
+  location : string;
   shifts: { id: string, date: Date, to: Date, from: Date }[]
 }
 
 interface Params {
   id: string;
+  locations : {id : string, name : string}[];
 }
 
-const AdminHoursDashboard = ({ id }: Params) => {
+const AdminHoursDashboard = ({ id, locations }: Params) => {
   const [loading, setIsLoading] = useState(true)
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [timePeriod, setTimePeriod] = useState('this');
@@ -68,10 +70,10 @@ const AdminHoursDashboard = ({ id }: Params) => {
   useEffect(() => {
     const fetchInfo = async () => {
       if (date && date.from && date.to) {
-        const instructors = await getUsersAndTimeWorked({ id: id, from: date.from, to: date.to })
+        const instructors : any = await getUsersAndTimeWorked({ id: id, from: date.from, to: date.to })
         setEmployees(instructors);
         if(selectedEmployee !== null){
-            const instructor : any = instructors.find((instructor) => instructor.id === selectedEmployee.id);
+            const instructor : any = instructors.find((instructor : any) => instructor.id === selectedEmployee.id);
             setSelectedEmployee(instructor);
             console.log(instructor);
         }
@@ -248,6 +250,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
                 <TableHead>Role</TableHead>
                 <TableHead>Hours Worked</TableHead>
                 <TableHead>Last Clock In</TableHead>
+                <TableHead>Location</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -264,6 +267,7 @@ const AdminHoursDashboard = ({ id }: Params) => {
                     <TableCell>{employee.role}</TableCell>
                     <TableCell>{employee.hoursWorked.toFixed(1)}</TableCell>
                     <TableCell>{employee.lastClockIn}</TableCell>
+                    <TableCell>{locations.find((loc) => loc.id === employee.location)?.name}</TableCell>
                   </TableRow>
                 ))
               )}

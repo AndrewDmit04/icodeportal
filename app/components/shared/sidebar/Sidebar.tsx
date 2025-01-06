@@ -1,6 +1,7 @@
 // import { Calendar, Search, Settings, LayoutDashboardIcon, TimerIcon} from "lucide-react"
 import { adminContents } from "./sidebars/admin"
 import {userContents} from "./sidebars/user"
+import { OwnerContents } from "./sidebars/owner"
 import Link from "next/link"
 
 import {
@@ -24,7 +25,16 @@ export async function AppSidebar() {
   const user = await currentUser();
   if(!user){return}
   const role = await getRole({id : user.id});
-  const items = role === "Director" ? adminContents : userContents;
+  let items;
+  if (role === "Owner"){
+    items = OwnerContents;
+  } else if (role === "Director"){
+    items = adminContents;
+  }
+  else {
+    items = userContents;
+  }
+
   return (
     <Sidebar>
       <SidebarContent>
