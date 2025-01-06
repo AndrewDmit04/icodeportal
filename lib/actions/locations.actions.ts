@@ -7,10 +7,15 @@ interface ParamsLoc {
     id : string;
 
 }
-
+let connected = false;
+if(!connected){
+  connectToDB();
+  connected = true;
+  console.log("connection estanblished for locations");
+}
 export async function getAllLocations() : Promise<any> {
     try{
-        connectToDB();
+        //connectToDB();
 
         const locations = await Location.find({}).lean();
         const plainLocations = locations.map((location : any) => ({
@@ -35,7 +40,7 @@ interface Params {
 export async function createOrFindLocation({id, name, address } : Params) : Promise<void> {
     try {
       // Find and update the user if exists, or create a new one if not
-      connectToDB();
+      //connectToDB();
       const role  = await getRole({id});
       if(role != "Owner"){
         throw new Error("You are not authorized to create a location");
@@ -54,7 +59,7 @@ export async function createOrFindLocation({id, name, address } : Params) : Prom
 export async function deleteLocation({id, locationId} : {id : string, locationId : string}) : Promise<void> {
     try {
       // Find and update the user if exists, or create a new one if not
-      connectToDB();
+      //connectToDB();
       const role  = await getRole({id});
       if(role != "Owner"){
         throw new Error("You are not authorized to create a location");
