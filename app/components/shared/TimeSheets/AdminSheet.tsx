@@ -264,7 +264,7 @@ const AdminHoursDashboard = ({ id, locations }: Params) => {
           </Popover> : <></>
         }
         <p>from {getPmAm(date?.from)} to {getPmAm(date?.to)}</p>
-        <Button onClick={() => exportEmployeeReport(employees)} className="ml-auto">Export Report</Button>
+        <Button onClick={() => exportEmployeeReport(filteredEmployees)} className="ml-auto">Export Report</Button>
       </div>
 
       {/* Main Table */}
