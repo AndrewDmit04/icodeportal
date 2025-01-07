@@ -14,7 +14,7 @@ const ensureConnection = async () => {
   if (!connectionPromise) {
     connectionPromise = connectToDB();
     await connectionPromise;
-    console.log("Database connection established");
+    console.log("Database connection established from locations");
   }
   return connectionPromise;
 };

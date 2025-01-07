@@ -15,6 +15,7 @@ const Sheet = async() => {
   const locations = await getAllLocations();
   return (
     <div>
+        {/* testing */}
         {isAdmin ? <AdminHoursDashboard id={user.id} locations={locations}/> : <UserHoursDashboard id={user.id}/> }
     </div>
   )
