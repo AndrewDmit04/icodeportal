@@ -13,6 +13,7 @@ const Clock = async() => {
   const locations = await getAllLocations();
   return (
     <div>
+        {/* testing */}
         {isAdmin ? <AdminPunch id={user.id} locations={locations}/> : <UserPunch id={user.id}/> }
     </div>
   )
