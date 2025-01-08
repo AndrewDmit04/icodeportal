@@ -32,7 +32,7 @@ import {
 import { getUsersAndTimeWorked } from '@/lib/actions/user.actions';
 import ShiftManagementModal from './TimeModal';
 import {Skeleton} from "@/components/ui/skeleton" // Import Skeleton
-import { exportEmployeeReport } from './exportEmployeeReport';
+import { exportEmployeeReport } from './fileExportFunctions/exportEmployeeReport';
 import { getUserStamps } from '@/lib/actions/stamp.actions';
 
 interface shifts{ id: string, date: Date, to: Date, from: Date }[]
