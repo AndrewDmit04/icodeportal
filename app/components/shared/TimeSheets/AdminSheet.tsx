@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from "@/lib/utils"
 import { addDays, subDays, format, startOfWeek } from "date-fns"
 import { DateRange } from "react-day-picker"
-import { Calendar as CalendarIcon, MapPin } from "lucide-react"
+import { Calendar as CalendarIcon, File, FileDown, FileSpreadsheet, MapPin } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Table,
@@ -32,7 +32,9 @@ import {
 import { getRole, getUsersAndTimeWorked } from '@/lib/actions/user.actions';
 import ShiftManagementModal from './TimeModal';
 import {Skeleton} from "@/components/ui/skeleton" // Import Skeleton
-import { exportEmployeeReport } from './exportEmployeeReport';
+import { exportEmployeeReport } from './fileExportFunctions/exportEmployeeReport';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {exportEmployeeReportCSV} from './fileExportFunctions/csvExportReport'
 
 interface Employee {
   id: string;
@@ -264,7 +266,34 @@ const AdminHoursDashboard = ({ id, locations }: Params) => {
           </Popover> : <></>
         }
         <p>from {getPmAm(date?.from)} to {getPmAm(date?.to)}</p>
-        <Button onClick={() => exportEmployeeReport(filteredEmployees)} className="ml-auto">Export Report</Button>
+        
+        <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="secondary" className="ml-auto flex items-center gap-2">
+          <FileDown className="h-4 w-4" />
+          Export Report
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-48">
+        <DropdownMenuLabel>Choose format</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem 
+          onClick={() => exportEmployeeReportCSV(filteredEmployees)}
+          className="flex items-center gap-2 cursor-pointer"
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          <span>Export as CSV</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => exportEmployeeReport(filteredEmployees)}
+          className="flex items-center gap-2 cursor-pointer"
+        >
+          <File className="h-4 w-4" />
+          <span>Export as PDF</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+      
       </div>
 
       {/* Main Table */}
