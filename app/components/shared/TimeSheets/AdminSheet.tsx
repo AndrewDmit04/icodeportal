@@ -34,7 +34,7 @@ import ShiftManagementModal from './TimeModal';
 import {Skeleton} from "@/components/ui/skeleton" // Import Skeleton
 import { exportEmployeeReport } from './fileExportFunctions/exportEmployeeReport';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import {exportEmployeeReportCSV} from './fileExportFunctions/CsvExportReport'
+import {exportEmployeeReportCSV} from './fileExportFunctions/csvExportReport'
 
 interface Employee {
   id: string;
