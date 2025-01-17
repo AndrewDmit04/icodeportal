@@ -265,7 +265,7 @@ const AdminHoursDashboard = ({ id, locations }: Params) => {
             </PopoverContent>
           </Popover> : <></>
         }
-        <p>from {getPmAm(date?.from)} to {getPmAm(date?.to)}</p>
+        {timePeriod !== "custom" && <p>from {getPmAm(date?.from)} to {getPmAm(date?.to)}</p>}
         
         <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -325,7 +325,7 @@ const AdminHoursDashboard = ({ id, locations }: Params) => {
                     <TableCell className="font-medium">{employee.name}</TableCell>
                     <TableCell>{employee.role}</TableCell>
                     <TableCell>{employee.hoursWorked.toFixed(1)}</TableCell>
-                    <TableCell>{employee.lastClockIn}</TableCell>
+                    <TableCell>{(employee.lastClockIn)}</TableCell>
                     <TableCell>{locations.find((loc) => loc.id === employee.location)?.name}</TableCell>
                   </TableRow>
                 ))

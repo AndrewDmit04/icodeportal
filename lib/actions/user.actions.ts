@@ -321,7 +321,7 @@ export async function getUsersAndTimeWorked({id,from,to} : UserDates) : Promise<
         const overtime = totalHours > 40 ? totalHours - 40 : 0;
     
         const lastClockIn = instructorTimestamps.length
-          ? format(new Date(instructorTimestamps[instructorTimestamps.length - 1].clockIn), 'MM-dd-yyyy HH:mm:ss')
+          ? format(new Date(instructorTimestamps[instructorTimestamps.length - 1].clockIn), 'MM-dd-yyyy hh:mm:ss a')
           : 'N/A';
     
         return {
