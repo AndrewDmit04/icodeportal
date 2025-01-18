@@ -1,1 +1,1 @@
-# All rights reserved by Developer
+# All rights reserved by Developers
