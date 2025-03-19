@@ -10,12 +10,12 @@ export const exportEmployeeReport = (employees: any[]) => {
 
   const tableColumn = ["Employee", "Role", "Hourly Rate", "Hours Worked", "Gross Pay"];
   const tableRows = employees.map((employee) => {
-    const grossPay = (employee.hourlyRate * employee.hoursWorked).toFixed(2); // Calculate gross pay
+    const grossPay = (employee.hourlyRate * employee.hoursWorked.toFixed(3)).toFixed(2); // Calculate gross pay
     return [
       employee.name,
       employee.role,
       employee.hourlyRate.toFixed(2),
-      employee.hoursWorked.toFixed(1),
+      employee.hoursWorked.toFixed(3),
       `$${grossPay}`, 
     ];
   });

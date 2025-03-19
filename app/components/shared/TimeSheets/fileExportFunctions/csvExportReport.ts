@@ -13,12 +13,12 @@ export const exportEmployeeReportCSV = (employees: Employee[]): void => {
   
   // Create rows data with type safety
   const rows: string[][] = employees.map((employee: Employee) => {
-    const grossPay: string = (employee.hourlyRate * employee.hoursWorked).toFixed(2);
+    const grossPay: string = (employee.hourlyRate * parseFloat(employee.hoursWorked.toFixed(3))).toFixed(2);
     return [
       employee.name,
       employee.role,
       employee.hourlyRate.toFixed(2),
-      employee.hoursWorked.toFixed(1),
+      employee.hoursWorked.toFixed(3),
       `$${grossPay}`
     ];
   });
