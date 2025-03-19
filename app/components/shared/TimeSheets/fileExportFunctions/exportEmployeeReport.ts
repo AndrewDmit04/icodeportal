@@ -8,13 +8,14 @@ export const exportEmployeeReport = (employees: any[]) => {
   doc.setFontSize(12);
   doc.text("Employee Report", 14, 20);
 
-  const tableColumn = ["Employee", "Role", "Hours Worked", "Gross Pay"];
+  const tableColumn = ["Employee", "Role", "Hourly Rate", "Hours Worked", "Gross Pay"];
   const tableRows = employees.map((employee) => {
-    const grossPay = (employee.hourlyRate * employee.hoursWorked).toFixed(2); // Calculate gross pay
+    const grossPay = (employee.hourlyRate * employee.hoursWorked.toFixed(3)).toFixed(2); // Calculate gross pay
     return [
       employee.name,
       employee.role,
-      employee.hoursWorked.toFixed(1),
+      employee.hourlyRate.toFixed(2),
+      employee.hoursWorked.toFixed(3),
       `$${grossPay}`, 
     ];
   });

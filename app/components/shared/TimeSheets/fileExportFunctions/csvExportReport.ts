@@ -9,15 +9,16 @@ interface Employee {
 
 export const exportEmployeeReportCSV = (employees: Employee[]): void => {
   // Define headers with explicit typing
-  const headers: string[] = ["Employee", "Role", "Hours Worked", "Gross Pay"];
+  const headers: string[] = ["Employee", "Role","Hourly Rate", "Hours Worked", "Gross Pay"];
   
   // Create rows data with type safety
   const rows: string[][] = employees.map((employee: Employee) => {
-    const grossPay: string = (employee.hourlyRate * employee.hoursWorked).toFixed(2);
+    const grossPay: string = (employee.hourlyRate * parseFloat(employee.hoursWorked.toFixed(3))).toFixed(2);
     return [
       employee.name,
       employee.role,
-      employee.hoursWorked.toFixed(1),
+      employee.hourlyRate.toFixed(2),
+      employee.hoursWorked.toFixed(3),
       `$${grossPay}`
     ];
   });
