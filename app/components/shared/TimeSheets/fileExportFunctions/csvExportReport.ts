@@ -9,7 +9,7 @@ interface Employee {
 
 export const exportEmployeeReportCSV = (employees: Employee[]): void => {
   // Define headers with explicit typing
-  const headers: string[] = ["Employee", "Role", "Hours Worked", "Gross Pay"];
+  const headers: string[] = ["Employee", "Role","Hourly Rate", "Hours Worked", "Gross Pay"];
   
   // Create rows data with type safety
   const rows: string[][] = employees.map((employee: Employee) => {
@@ -17,6 +17,7 @@ export const exportEmployeeReportCSV = (employees: Employee[]): void => {
     return [
       employee.name,
       employee.role,
+      employee.hourlyRate.toFixed(2),
       employee.hoursWorked.toFixed(1),
       `$${grossPay}`
     ];
